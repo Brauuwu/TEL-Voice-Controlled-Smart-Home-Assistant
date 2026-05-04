@@ -1,0 +1,78 @@
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// PIN Configuration
+#define LED_PIN D4
+#define CE_PIN D8
+#define CSN_PIN D0
+
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+RF24 radio(CE_PIN, CSN_PIN);
+
+// NRF Address
+const byte address[6] = "NODE2";
+
+struct PayloadNode2 {
+  float temp;
+  float hum;
+  float light;
+  bool motion;
+  bool ledState;
+};
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+  
+  if(!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
+    Serial.println(F("SSD1306 failed"));
+  }
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("Actuators Node");
+  display.display();
+
+  if (!radio.begin()) {
+    Serial.println(F("nRF24L01 failed!"));
+    while (1);
+  }
+  
+  radio.setDataRate(RF24_1MBPS);
+  radio.setChannel(76);
+  radio.setPALevel(RF24_PA_LOW);
+  radio.openReadingPipe(1, address);
+  radio.startListening();
+  
+  Serial.println("Actuators Node Started...");
+}
+
+void loop() {
+  if (radio.available()) {
+    PayloadNode2 data;
+    radio.read(&data, sizeof(data));
+    
+    Serial.print("Received Data - LED: "); Serial.println(data.ledState);
+    digitalWrite(LED_PIN, data.ledState ? HIGH : LOW);
+    
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.setTextSize(1);
+    display.println("--- STATUS ---");
+    display.println("");
+    
+    display.print("LED: "); display.println(data.ledState ? "ON" : "OFF");
+    display.print("Light: "); display.print(data.light); display.println(" Lux");
+    display.print("Motion: "); display.println(data.motion ? "DETECTED" : "CLEAR");
+    
+    display.println("");
+    display.print("Temp: "); display.print(data.temp); display.println(" C");
+    
+    display.display();
+  }
+}

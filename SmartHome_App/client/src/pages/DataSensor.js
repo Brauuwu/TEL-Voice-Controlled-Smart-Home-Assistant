@@ -1,0 +1,267 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Database, Search, Thermometer, Droplets, Sun, Wind, Calendar, Clock, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
+import _ from 'lodash';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8688');
+
+const DataSensor = ({ dataSensor, setDataSensor, currentPage, setCurrentPage }) => {
+    const navigate = useNavigate();
+    const [filteredData, setFilteredData] = useState([]);
+    const [sortField, setSortField] = useState('timestamp');
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [searchValue, setSearchValue] = useState('');
+    const [searchField, setSearchField] = useState('temp');
+    const [isSearching, setIsSearching] = useState(false);
+
+    const recordsPerPage = 10;
+
+    useEffect(() => {
+        // Initial fetch
+        fetch('http://localhost:8688/api/sensordata')
+            .then((res) => res.json())
+            .then((data) => {
+                setDataSensor(data);
+            })
+            .catch((err) => console.error('Fetch sensor data error:', err));
+
+        // Real-time listener
+        socket.on('sensor_update', (newData) => {
+            setDataSensor(prev => {
+                // Check if the record already exists (to avoid duplicates if fetch and socket overlap)
+                const exists = prev.some(item => item.id === newData.id);
+                if (exists) return prev;
+
+                // Create a new record matching DB structure for immediate UI update
+                const record = {
+                    id: newData.id || Date.now(), // Fallback if ID not provided
+                    temp: newData.temperature,
+                    humi: newData.humidity,
+                    light: newData.ldr,
+                    date: new Date().toISOString(), // Use current time for live updates
+                    ...newData
+                };
+                return [record, ...prev];
+            });
+        });
+
+        return () => {
+            socket.off('sensor_update');
+        };
+    }, []);
+
+    const handleSort = (field) => {
+        const newOrder = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+        setSortField(field);
+        setSortOrder(newOrder);
+        const sorted = _.orderBy(dataSensor, [field], [newOrder]);
+        setDataSensor(sorted);
+    };
+
+    const handleSearch = () => {
+        if (!searchValue) {
+            setIsSearching(false);
+            setFilteredData([]);
+            return;
+        }
+
+        const filtered = _.filter(dataSensor, (item) => {
+            const val = item[searchField]?.toString().toLowerCase();
+            return val?.includes(searchValue.toLowerCase());
+        });
+
+        setFilteredData(filtered);
+        setIsSearching(true);
+        setCurrentPage(1);
+    };
+
+    const displayData = isSearching ? filteredData : dataSensor;
+    const lastIndex = currentPage * recordsPerPage;
+    const firstIndex = lastIndex - recordsPerPage;
+    const records = displayData.slice(firstIndex, lastIndex);
+    const npage = Math.ceil(displayData.length / recordsPerPage);
+
+    return (
+        <div className="min-h-screen bg-slate-50 p-8 font-sans">
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+                    <div className="flex items-center gap-6">
+                        <button 
+                            onClick={() => navigate('/dashboard')}
+                            className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm group"
+                        >
+                            <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+                        </button>
+                        <div>
+                            <h1 className="text-3xl font-black text-slate-800 flex items-center gap-3">
+                                <Database className="w-8 h-8 text-blue-600" />
+                                Sensor Data
+                            </h1>
+                            <p className="text-slate-500 font-medium mt-1">Real-time and historical sensor telemetry</p>
+                        </div>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="flex items-center gap-2 bg-white p-2 pl-4 rounded-2xl border border-slate-200 shadow-sm w-full md:w-auto">
+                        <Search className="w-4 h-4 text-slate-400" />
+                        <input 
+                            type="text"
+                            placeholder="Search value..."
+                            className="bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 w-full md:w-40"
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                        <select 
+                            className="bg-slate-50 border-none text-[10px] font-black uppercase tracking-widest text-slate-500 rounded-xl focus:ring-0 cursor-pointer"
+                            value={searchField}
+                            onChange={(e) => setSearchField(e.target.value)}
+                        >
+                            <option value="temp">Temp</option>
+                            <option value="humi">Humid</option>
+                            <option value="light">Light</option>
+                            <option value="motion">Motion</option>
+                        </select>
+                        <button 
+                            onClick={handleSearch}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="bg-white rounded-[32px] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                <th onClick={() => handleSort('id')} className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">ID</th>
+                                <th onClick={() => handleSort('temp')} className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                        <Thermometer className="w-3.5 h-3.5 text-orange-500" />
+                                        Temperature
+                                    </div>
+                                </th>
+                                <th onClick={() => handleSort('humi')} className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                        <Droplets className="w-3.5 h-3.5 text-blue-500" />
+                                        Humidity
+                                    </div>
+                                </th>
+                                <th onClick={() => handleSort('light')} className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                        <Sun className="w-3.5 h-3.5 text-yellow-500" />
+                                        Light (Lux)
+                                    </div>
+                                </th>
+                                <th onClick={() => handleSort('motion')} className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-blue-600 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                        <Activity className="w-3.5 h-3.5 text-rose-500" />
+                                        Motion
+                                    </div>
+                                </th>
+                                <th className="p-6 text-[11px] font-black text-slate-400 uppercase tracking-widest">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {records.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" className="p-20 text-center text-slate-400 italic">No sensor data found</td>
+                                </tr>
+                            ) : (
+                                records.map((sensor, i) => (
+                                    <tr key={i} className="hover:bg-slate-50/50 transition-colors group">
+                                        <td className="p-6 text-sm font-bold text-slate-400">#{sensor.id}</td>
+                                        <td className="p-6">
+                                            <span className="text-lg font-black text-slate-800">{sensor.temp}</span>
+                                            <span className="text-xs font-bold text-slate-400 ml-1">°C</span>
+                                        </td>
+                                        <td className="p-6">
+                                            <span className="text-lg font-black text-slate-800">{sensor.humi}</span>
+                                            <span className="text-xs font-bold text-slate-400 ml-1">%</span>
+                                        </td>
+                                        <td className="p-6">
+                                            <span className="text-lg font-black text-slate-800">{sensor.light}</span>
+                                            <span className="text-xs font-bold text-slate-400 ml-1">Lux</span>
+                                        </td>
+                                        <td className="p-6">
+                                            <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                                                sensor.motion || sensor.motion === 1 
+                                                ? 'bg-rose-100 text-rose-600 border border-rose-200' 
+                                                : 'bg-emerald-100 text-emerald-600 border border-emerald-200'
+                                            }`}>
+                                                {sensor.motion || sensor.motion === 1 ? 'Detected' : 'Clear'}
+                                            </span>
+                                        </td>
+                                        <td className="p-6">
+                                            <div className="flex flex-col">
+                                                <div className="flex items-center gap-1.5 text-slate-700 text-sm font-bold">
+                                                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                                    {new Date(sensor.date || sensor.timestamp || sensor.created_at).toLocaleDateString('vi-VN')}
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-slate-400 text-[10px] font-medium mt-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(sensor.date || sensor.timestamp || sensor.created_at).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+
+                    {/* Pagination */}
+                    {npage > 1 && (
+                        <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                            <p className="text-xs font-bold text-slate-400">Showing {firstIndex + 1} to {Math.min(lastIndex, displayData.length)} of {displayData.length} records</p>
+                            <div className="flex gap-2">
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                    disabled={currentPage === 1}
+                                    className="p-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                <div className="flex gap-1">
+                                    {[...Array(npage)].map((_, i) => {
+                                        const n = i + 1;
+                                        if (n === 1 || n === npage || (n >= currentPage - 1 && n <= currentPage + 1)) {
+                                            return (
+                                                <button 
+                                                    key={n}
+                                                    onClick={() => setCurrentPage(n)}
+                                                    className={`w-9 h-9 rounded-xl text-xs font-black transition-all ${
+                                                        currentPage === n 
+                                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
+                                                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                                    }`}
+                                                >
+                                                    {n}
+                                                </button>
+                                            );
+                                        }
+                                        if (n === 2 || n === npage - 1) return <span key={n} className="px-1 self-center text-slate-400">...</span>;
+                                        return null;
+                                    })}
+                                </div>
+                                <button 
+                                    onClick={() => setCurrentPage(prev => Math.min(npage, prev + 1))}
+                                    disabled={currentPage === npage}
+                                    className="p-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 disabled:opacity-50 transition-all"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default DataSensor;
