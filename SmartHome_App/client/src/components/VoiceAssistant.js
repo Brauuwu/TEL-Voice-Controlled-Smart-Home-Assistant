@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { VOICE_URL } from '../config';
 
 const VoiceAssistant = ({ onCommand, sensors, status }) => {
     const [isListening, setIsListening] = useState(false);
@@ -170,8 +171,8 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
         const timeout = setTimeout(() => setIsSpeaking(false), 7000);
         
         try {
-            const response = await axios.post('http://localhost:5000/tts', { text, lang: 'vi' });
-            const audio = new Audio(`http://localhost:5000${response.data.url}`);
+            const response = await axios.post(`${VOICE_URL}/tts`, { text, lang: 'vi' });
+            const audio = new Audio(`${VOICE_URL}${response.data.url}`);
             audio.onended = () => {
                 clearTimeout(timeout);
                 setIsSpeaking(false);
