@@ -105,13 +105,13 @@ const Dashboard = ({ user, onLogout }) => {
         const payload = {
             device,
             action: typeof nextAction === 'boolean' ? (nextAction ? 'ON' : 'OFF') : nextAction,
-            username: user.username, 
+            username: user.username,
             type: type
         };
-        
+
         console.log('📤 Sending Control:', payload);
         socket.emit('control_device', payload);
-        
+
         // Optimistic update for both boolean and numeric values
         // Convert 'ON'/'OFF' strings to boolean for visual switch state
         const visualState = (nextAction === 'ON') ? true : (nextAction === 'OFF' ? false : nextAction);
@@ -134,21 +134,21 @@ const Dashboard = ({ user, onLogout }) => {
                     <div className="hidden lg:flex items-center gap-2">
                         {user.role === 'admin' && (
                             <>
-                                <button 
+                                <button
                                     onClick={() => navigate('/history')}
                                     className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                                 >
                                     <History className="w-4 h-4" />
                                     History
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => navigate('/datasensor')}
                                     className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                                 >
                                     <Database className="w-4 h-4" />
                                     Sensors
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => navigate('/users')}
                                     className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                                 >
@@ -157,14 +157,14 @@ const Dashboard = ({ user, onLogout }) => {
                                 </button>
                             </>
                         )}
-                        <button 
+                        <button
                             onClick={() => navigate('/about')}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                         >
                             <User className="w-4 h-4" />
                             About
                         </button>
-                        <button 
+                        <button
                             onClick={onLogout}
                             className="ml-4 px-6 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl hover:bg-rose-600 hover:text-white transition-all font-bold shadow-sm"
                         >
@@ -180,10 +180,10 @@ const Dashboard = ({ user, onLogout }) => {
                             {status === 'online' ? 'Online' : 'Offline'}
                         </span>
                     </div>
-                    
+
                     {/* Inbox/Activity Dropdown Container */}
                     <div className="relative">
-                        <button 
+                        <button
                             onClick={() => setIsLogOpen(!isLogOpen)}
                             className="relative p-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm group z-10"
                         >
@@ -202,10 +202,10 @@ const Dashboard = ({ user, onLogout }) => {
                                     </h2>
                                     <div className="flex items-center gap-2">
                                         <span className="text-[9px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg uppercase tracking-widest">{logs.length} New</span>
-                                        <button onClick={() => setIsLogOpen(false)} className="lg:hidden p-2 text-slate-400"><X size={20}/></button>
+                                        <button onClick={() => setIsLogOpen(false)} className="lg:hidden p-2 text-slate-400"><X size={20} /></button>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                                     {logs.length === 0 ? (
                                         <div className="text-center py-20 text-slate-400 italic text-sm">No recent activity</div>
@@ -237,7 +237,7 @@ const Dashboard = ({ user, onLogout }) => {
                                         ))
                                     )}
                                 </div>
-                                <button 
+                                <button
                                     onClick={() => setIsLogOpen(false)}
                                     className="p-6 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors border-t border-slate-50 w-full text-center safe-bottom"
                                 >
@@ -257,13 +257,13 @@ const Dashboard = ({ user, onLogout }) => {
                         <GaugeCard icon={<Thermometer className="w-5 h-5 lg:w-6 lg:h-6" />} label="Temp" value={status === 'online' ? sensors.temperature : '--'} unit="°C" color="from-orange-400 to-red-500" progress={sensors.temperature * 2} />
                         <GaugeCard icon={<Droplets className="w-5 h-5 lg:w-6 lg:h-6" />} label="Humi" value={status === 'online' ? sensors.humidity : '--'} unit="%" color="from-blue-400 to-indigo-500" progress={sensors.humidity} />
                         <GaugeCard icon={<Sun className="w-5 h-5 lg:w-6 lg:h-6" />} label="Light" value={status === 'online' ? sensors.ldr : '--'} unit="Lux" color="from-yellow-400 to-orange-500" progress={sensors.ldr / 10} />
-                        <GaugeCard 
-                            icon={<Activity className="w-5 h-5 lg:w-6 lg:h-6" />} 
-                            label="Motion" 
-                            value={status === 'online' ? (sensors.motion ? 'YES' : 'NO') : '--'} 
-                            unit="" 
-                            color={sensors.motion ? "from-rose-400 to-rose-600" : "from-emerald-400 to-emerald-600"} 
-                            progress={sensors.motion ? 100 : 0} 
+                        <GaugeCard
+                            icon={<Activity className="w-5 h-5 lg:w-6 lg:h-6" />}
+                            label="Motion"
+                            value={status === 'online' ? (sensors.motion ? 'YES' : 'NO') : '--'}
+                            unit=""
+                            color={sensors.motion ? "from-rose-400 to-rose-600" : "from-emerald-400 to-emerald-600"}
+                            progress={sensors.motion ? 100 : 0}
                         />
                     </div>
 
@@ -296,44 +296,43 @@ const Dashboard = ({ user, onLogout }) => {
                                 <Lightbulb className="w-5 h-5 text-yellow-500" />
                                 Controls
                             </h2>
-                            <button 
+                            <button
                                 onClick={() => {
                                     const nextMode = mode === 'manual' ? 'auto' : 'manual';
                                     setMode(nextMode);
                                     controlDevice('mode', nextMode);
                                 }}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all font-black text-[9px] tracking-widest uppercase ${
-                                    mode === 'auto' 
-                                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200' 
-                                    : 'bg-white border-slate-200 text-slate-400'
-                                }`}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all font-black text-[9px] tracking-widest uppercase ${mode === 'auto'
+                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200'
+                                        : 'bg-white border-slate-200 text-slate-400'
+                                    }`}
                             >
                                 <Cpu className={`w-3.5 h-3.5 ${mode === 'auto' ? 'animate-pulse' : ''}`} />
                                 {mode}
                             </button>
                         </div>
-                        
+
                         <div className="space-y-4 lg:space-y-6">
-                            <DeviceToggle 
-                                icon={<Lightbulb />} 
-                                label="Main LED" 
-                                active={devices.led} 
-                                onClick={() => controlDevice('led', 'TOGGLE')} 
+                            <DeviceToggle
+                                icon={<Lightbulb />}
+                                label="Main LED"
+                                active={devices.led}
+                                onClick={() => controlDevice('led', 'TOGGLE')}
                                 color="yellow"
                             />
-                            <DeviceToggle 
-                                icon={<Wind />} 
-                                label="Cooling Fan" 
-                                active={devices.fan} 
-                                onClick={() => controlDevice('fan', 'TOGGLE')} 
+                            <DeviceToggle
+                                icon={<Wind />}
+                                label="Cooling Fan"
+                                active={devices.fan}
+                                onClick={() => controlDevice('fan', 'TOGGLE')}
                                 color="blue"
                                 spin={devices.fan}
                             />
-                            <DeviceToggle 
-                                icon={<Volume2 />} 
-                                label="Security Buzzer" 
-                                active={devices.buzzer} 
-                                onClick={() => controlDevice('buzzer', 'TOGGLE')} 
+                            <DeviceToggle
+                                icon={<Volume2 />}
+                                label="Security Buzzer"
+                                active={devices.buzzer}
+                                onClick={() => controlDevice('buzzer', 'TOGGLE')}
                                 color="rose"
                                 bounce={devices.buzzer}
                             />
@@ -341,33 +340,33 @@ const Dashboard = ({ user, onLogout }) => {
                             {/* RGB Sliders */}
                             <div className="space-y-6 p-6 rounded-2xl bg-slate-50/50 border border-slate-100">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adjustable Nodes</h3>
-                                
-                                <SliderControl 
-                                    icon={<Maximize2 className="text-rose-500" />} 
-                                    label="Curtain" 
-                                    value={devices.curtain} 
+
+                                <SliderControl
+                                    icon={<Maximize2 className="text-rose-500" />}
+                                    label="Curtain"
+                                    value={devices.curtain}
                                     onChange={(val) => controlDevice('curtain', val)}
                                     color="rose"
                                 />
-                                <SliderControl 
-                                    icon={<AirVent className="text-emerald-500" />} 
-                                    label="AC Unit" 
-                                    value={devices.ac} 
+                                <SliderControl
+                                    icon={<AirVent className="text-emerald-500" />}
+                                    label="AC Unit"
+                                    value={devices.ac}
                                     onChange={(val) => controlDevice('ac', val)}
                                     color="emerald"
                                 />
                             </div>
 
-                            <DeviceToggle 
-                                icon={<Tv />} 
-                                label="Smart TV" 
-                                active={devices.tv} 
-                                onClick={() => controlDevice('tv', 'TOGGLE')} 
+                            <DeviceToggle
+                                icon={<Tv />}
+                                label="Smart TV"
+                                active={devices.tv}
+                                onClick={() => controlDevice('tv', 'TOGGLE')}
                                 color="blue"
                             />
                         </div>
                     </div>
-                    
+
                     <div className="premium-gradient rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
                         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
                         <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
@@ -376,8 +375,8 @@ const Dashboard = ({ user, onLogout }) => {
                 </div>
             </div>
 
-            <VoiceAssistant 
-                onCommand={(cmd) => controlDevice(cmd.device, cmd.action, cmd.type)} 
+            <VoiceAssistant
+                onCommand={(cmd) => controlDevice(cmd.device, cmd.action, cmd.type)}
                 sensors={sensors}
                 status={status}
             />
@@ -392,8 +391,8 @@ const Dashboard = ({ user, onLogout }) => {
                         <div className="flex flex-col">
                             <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{latestActivity.device}</p>
                             <p className="text-xs font-bold leading-none">
-                                {typeof latestActivity.action === 'number' || !isNaN(latestActivity.action) && latestActivity.action !== 'ON' && latestActivity.action !== 'OFF' 
-                                    ? `Set to ${latestActivity.action}%` 
+                                {typeof latestActivity.action === 'number' || !isNaN(latestActivity.action) && latestActivity.action !== 'ON' && latestActivity.action !== 'OFF'
+                                    ? `Set to ${latestActivity.action}%`
                                     : (latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === true ? 'ON' : 'OFF')}
                             </p>
                         </div>
@@ -430,14 +429,14 @@ const TrendChart = ({ title, data, dataKey, color, gradientId }) => (
             <AreaChart data={data}>
                 <defs>
                     <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor={color} stopOpacity={0}/>
+                        <stop offset="5%" stopColor={color} stopOpacity={0.2} />
+                        <stop offset="95%" stopColor={color} stopOpacity={0} />
                     </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="time" hide />
                 <YAxis stroke="#cbd5e1" fontSize={10} domain={['auto', 'auto']} tickLine={false} axisLine={false} />
-                <Tooltip 
+                <Tooltip
                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
                     itemStyle={{ color: color }}
                 />
@@ -466,7 +465,7 @@ const DeviceToggle = ({ icon, label, active, onClick, color, spin, bounce }) => 
                     <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{active ? 'Active' : 'Off'}</p>
                 </div>
             </div>
-            <button 
+            <button
                 onClick={onClick}
                 className={`w-12 lg:w-14 h-7 lg:h-8 rounded-full relative transition-all ${active ? 'bg-indigo-600 shadow-lg shadow-indigo-200' : 'bg-slate-300'}`}
             >
@@ -492,11 +491,11 @@ const SliderControl = ({ icon, label, value, onChange, color }) => {
                 </div>
                 <span className={`font-black ${color === 'rose' ? 'text-rose-600' : 'text-emerald-600'}`}>{value}%</span>
             </div>
-            <input 
-                type="range" min="0" max="100" 
-                value={value} 
+            <input
+                type="range" min="0" max="100"
+                value={value}
                 onChange={(e) => onChange(parseInt(e.target.value))}
-                className={`w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer ${accentColors[color]}`} 
+                className={`w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer ${accentColors[color]}`}
             />
         </div>
     );

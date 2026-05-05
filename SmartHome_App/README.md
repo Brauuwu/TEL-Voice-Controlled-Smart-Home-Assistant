@@ -1,68 +1,70 @@
 # 📱 TEL SmartHome Assistant
 
-Hệ thống điều khiển và giám sát nhà thông minh tích hợp trợ lý ảo giọng nói Tiếng Việt. Dự án được tối ưu hóa cho cả PC và Smartphone với giao diện hiện đại, trải nghiệm người dùng mượt mà.
+A smart home monitoring and control system integrated with a Vietnamese voice assistant. The project is optimized for both PC and Smartphone with a modern, fluid user experience.
 
-## ✨ Tính năng nổi bật
+## ✨ Key Features
 
--   **📱 Giao diện Mobile-First**: Thiết kế Premium, tối ưu hóa cho thao tác chạm, có thanh điều hướng (Bottom Navbar) tiện lợi.
--   **🎙️ Trợ lý ảo Tiếng Việt**: Điều khiển thiết bị và hỏi thông tin cảm biến qua giọng nói.
--   **📊 Giám sát thời gian thực**: Hiển thị thông số nhiệt độ, độ ẩm, ánh sáng qua biểu đồ và đồng hồ đo trực quan.
--   **🤖 Chế độ Tự động (Auto)**: Tự động điều khiển đèn và quạt dựa trên thông số cảm biến môi trường.
--   **🔐 Quản lý người dùng**: Hệ thống phân quyền Admin/User, bảo mật mật khẩu bằng Bcrypt.
+-   **📱 Mobile-First UI**: Premium design optimized for touch interactions, featuring a convenient Bottom Navigation Bar.
+-   **🎙️ Vietnamese Voice Assistant**: Control devices and query sensor data via Vietnamese voice commands (Powered by Google Speech Recognition & gTTS).
+-   **📊 Real-time Monitoring**: Visualize temperature, humidity, and light data through intuitive gauges and charts (Socket.io).
+-   **🤖 Auto Mode**: Smart automation logic that controls lights and fans based on environmental sensor thresholds.
+-   **🔐 User Management**: Role-based access control (Admin/User) with secure password hashing using Bcrypt.
+-   **📜 Activity Logs**: Detailed historical logs of all device interactions and system events.
 
-## 🛠️ Công nghệ sử dụng
+## 🛠️ Technology Stack
 
 -   **Frontend**: React.js, Tailwind CSS, Lucide React, Recharts, Socket.io Client.
--   **Backend**: Node.js, Express, MySQL, MQTT (HiveMQ), Socket.io.
+-   **Backend**: Node.js, Express, MySQL, MQTT (HiveMQ Cloud), Socket.io.
 -   **Voice Service**: Python Flask, Google Speech API, gTTS, FFmpeg.
 
-## ⚙️ Hướng dẫn cài đặt
+## ⚙️ Installation Guide
 
-### Yêu cầu hệ thống
+### Prerequisites
 -   Node.js v16+ & Python 3.9+
 -   MySQL Server & FFmpeg
 
-### Các bước thực hiện
+### Setup Steps
 
-1.  **Cấu hình Database**: Tạo database `btliot` và import các bảng cần thiết.
-2.  **Chạy Backend (Server)**:
+1.  **Database Configuration**: Create a database named `btliot` and import the required tables.
+2.  **Start the Backend (Server)**:
     ```bash
     cd server
     npm install
-    npm start # Chạy trên cổng 8688
+    # Configure your .env file with DB and MQTT credentials
+    npm start # Runs on port 8688
     ```
-3.  **Chạy Voice Service**:
+3.  **Start the Voice Service**:
     ```bash
     cd audio-service
     pip install -r requirements.txt
-    python main.py # Chạy trên cổng 5000
+    python main.py # Runs on port 5000
     ```
-4.  **Chạy Frontend (Client) với HTTPS**:
+4.  **Start the Frontend (Client) with HTTPS**:
     ```bash
     cd client
     npm install
-    # Chạy lệnh sau để bật HTTPS (bắt buộc để dùng Microphone trên điện thoại)
+    # Run this command to enable HTTPS (Required for microphone access on mobile)
     $env:HTTPS="true"; npm start
     ```
 
-## 🌐 Truy cập từ Smartphone (HTTPS Mode)
+## 🌐 Mobile Access (HTTPS Mode)
 
-Để sử dụng Microphone khi truy cập từ thiết bị khác trong mạng LAN, hệ thống đã được cấu hình chạy ở chế độ **Secure Context (HTTPS)**.
+To use the microphone when accessing from other devices in your LAN, the system is configured to run in a **Secure Context (HTTPS)**.
 
-### Các bước truy cập:
-1.  Xác định IP máy chủ của bạn (Ví dụ: `192.168.1.10`).
-2.  Trên điện thoại, truy cập địa chỉ: `https://192.168.1.10:3000`
-3.  **Bỏ qua cảnh báo bảo mật**: Nhấn **"Nâng cao" (Advanced)** -> **"Tiếp tục truy cập" (Proceed anyway)**.
-4.  **Cho phép Nội dung không an toàn (Mixed Content)**: 
-    -   Vì Client chạy `https` nhưng gọi API xuống Backend `http`.
-    -   Trên Chrome điện thoại: Nhấn vào biểu tượng **Cài đặt trang web** (gần thanh địa chỉ) -> **Nội dung không an toàn** -> Chọn **Cho phép**.
-5.  Bây giờ bạn có thể nhấn vào biểu tượng Micro và ra lệnh bằng giọng nói bình thường.
+### Access Steps:
+1.  Identify your Host IP (e.g., `192.168.1.10`).
+2.  On your phone, visit: `https://192.168.1.10:3000`
+3.  **Bypass Security Warning**: Click **"Advanced"** -> **"Proceed anyway"**.
+4.  **Allow Mixed Content (Crucial)**: 
+    -   Since the HTTPS client calls the HTTP backend.
+    -   On Mobile Chrome: Click the **Site Settings** icon (near the address bar) -> **Insecure content** -> Select **Allow**.
+5.  You can now use the Microphone icon for voice commands.
 
-## 🎙️ Lệnh giọng nói mẫu
--   "Bật đèn phòng khách" / "Tắt quạt"
--   "Nhiệt độ hiện tại là bao nhiêu?"
--   "Hỏi thông số thời tiết"
--   "Chuyển sang chế độ tự động"
+## 🎙️ Sample Voice Commands (Vietnamese)
+-   "Bật đèn phòng khách" (Turn on living room light)
+-   "Tắt quạt" (Turn off fan)
+-   "Nhiệt độ hiện tại là bao nhiêu?" (What is the current temperature?)
+-   "Hỏi thông số thời tiết" (Query weather parameters)
 
 ---
-*Dự án được thực hiện bởi nhóm sinh viên PTIT (Vi Minh Hiếu & Nguyễn Văn Hoàng).*
+*Developed by PTIT students (Vi Minh Hiếu & Nguyễn Văn Hoàng).*

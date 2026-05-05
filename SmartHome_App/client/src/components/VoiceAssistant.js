@@ -63,7 +63,7 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
 
         return () => {
             if (recognitionRef.current) {
-                try { recognitionRef.current.stop(); } catch(e) {}
+                try { recognitionRef.current.stop(); } catch (e) { }
             }
         };
     }, []);
@@ -96,13 +96,13 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
         const currentStatus = statusRef.current;
 
         // Keywords for any recognized command
-        const isRecognized = lowerText.includes("bật") || lowerText.includes("tắt") || 
-                             lowerText.includes("nhiệt độ") || lowerText.includes("độ ẩm") || 
-                             lowerText.includes("ánh sáng") || lowerText.includes("thông số") ||
-                             lowerText.includes("nóng") || lowerText.includes("mưa") || lowerText.includes("thời tiết") ||
-                             lowerText.includes("còi") || lowerText.includes("rèm") || lowerText.includes("điều hòa") ||
-                             lowerText.includes("tivi") || lowerText.includes("chuyển động") || lowerText.includes("mở") || lowerText.includes("đóng") || lowerText.includes("dừng");
-        
+        const isRecognized = lowerText.includes("bật") || lowerText.includes("tắt") ||
+            lowerText.includes("nhiệt độ") || lowerText.includes("độ ẩm") ||
+            lowerText.includes("ánh sáng") || lowerText.includes("thông số") ||
+            lowerText.includes("nóng") || lowerText.includes("mưa") || lowerText.includes("thời tiết") ||
+            lowerText.includes("còi") || lowerText.includes("rèm") || lowerText.includes("điều hòa") ||
+            lowerText.includes("tivi") || lowerText.includes("chuyển động") || lowerText.includes("mở") || lowerText.includes("đóng") || lowerText.includes("dừng");
+
         if (currentStatus !== 'online' && isRecognized) {
             speak("Rất tiếc, hệ thống đang ngoại tuyến, không thể lấy dữ liệu hoặc thực hiện lệnh lúc này.");
             return;
@@ -169,7 +169,7 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
         setIsSpeaking(true);
         // Safety timeout to reset speaking state after 7 seconds max
         const timeout = setTimeout(() => setIsSpeaking(false), 7000);
-        
+
         try {
             const response = await axios.post(`${VOICE_URL}/tts`, { text, lang: 'vi' });
             const audio = new Audio(`${VOICE_URL}${response.data.url}`);
@@ -197,10 +197,9 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
             )}
             <button
                 onClick={toggleListening}
-                className={`w-14 h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${
-                    isListening ? 'bg-rose-500 animate-pulse scale-110 shadow-rose-200' : 
-                    isSpeaking ? 'bg-blue-500 animate-bounce shadow-blue-200' : 'premium-gradient hover:scale-110 active:scale-95 shadow-indigo-200'
-                }`}
+                className={`w-14 h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${isListening ? 'bg-rose-500 animate-pulse scale-110 shadow-rose-200' :
+                        isSpeaking ? 'bg-blue-500 animate-bounce shadow-blue-200' : 'premium-gradient hover:scale-110 active:scale-95 shadow-indigo-200'
+                    }`}
             >
                 {isListening ? (
                     <div className="flex gap-1">
