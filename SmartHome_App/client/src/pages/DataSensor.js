@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Database, Search, Thermometer, Droplets, Sun, Wind, Calendar, Clock, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import _ from 'lodash';
 import io from 'socket.io-client';
+import API_URL from '../config';
 
-const socket = io('http://localhost:8688');
+const socket = io(API_URL);
 
 const DataSensor = ({ dataSensor, setDataSensor, currentPage, setCurrentPage }) => {
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ const DataSensor = ({ dataSensor, setDataSensor, currentPage, setCurrentPage }) 
 
     useEffect(() => {
         // Initial fetch
-        fetch('http://localhost:8688/api/sensordata')
+        fetch(`${API_URL}/api/sensordata`)
             .then((res) => res.json())
             .then((data) => {
                 setDataSensor(data);

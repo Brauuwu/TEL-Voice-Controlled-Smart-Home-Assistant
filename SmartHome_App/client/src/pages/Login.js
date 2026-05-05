@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_URL from '../config';
 
 const Login = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -9,7 +10,7 @@ const Login = ({ onLogin }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8688/api/auth/login', { username, password });
+            const response = await axios.post(`${API_URL}/api/auth/login`, { username, password });
             if (response.data.success) {
                 onLogin(response.data.user);
             }

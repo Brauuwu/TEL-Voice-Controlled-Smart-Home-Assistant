@@ -5,6 +5,7 @@ import sun from '../img/sun.png';
 import dobui from '../img/dobui.png';
 
 import io from 'socket.io-client';
+import API_URL from '../config';
 
 const Cards = ({
     tempCard,
@@ -24,7 +25,7 @@ const Cards = ({
     bgDb,
     setBgDb
 }) => {
-    const socket = io('http://localhost:8688');
+    const socket = io(API_URL);
     useEffect(() => {
         socket.on('temp', (data) => {
             setTempCard(data);

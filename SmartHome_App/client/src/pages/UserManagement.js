@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 import { ArrowLeft, Users, UserPlus, Trash2, Shield, User as UserIcon, Key } from 'lucide-react';
 
 const UserManagement = ({ user }) => {
@@ -16,14 +17,14 @@ const UserManagement = ({ user }) => {
     }, [user, navigate]);
 
     const fetchUsers = () => {
-        fetch('http://localhost:8688/api/users')
+        fetch(`${API_URL}/api/users`)
             .then(res => res.json())
             .then(data => setUsers(data));
     };
 
     const handleCreateUser = (e) => {
         e.preventDefault();
-        fetch('http://localhost:8688/api/users', {
+        fetch(`${API_URL}/api/users`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newUser)
@@ -35,7 +36,7 @@ const UserManagement = ({ user }) => {
 
     const handleDeleteUser = (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
-            fetch(`http://localhost:8688/api/users/${id}`, { method: 'DELETE' })
+            fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' })
                 .then(() => fetchUsers());
         }
     };

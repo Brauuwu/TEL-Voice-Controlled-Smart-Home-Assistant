@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import io from 'socket.io-client';
+import API_URL from '../config';
 import Chart from 'chart.js/auto';
 
 function DataChart({
@@ -16,7 +17,7 @@ function DataChart({
     setDb,
 }) {
     useEffect(() => {
-        const socket = io('http://localhost:8688');
+        const socket = io(API_URL);
 
         socket.on('temp', (data_received) => {
             const nhietdo = data_received;

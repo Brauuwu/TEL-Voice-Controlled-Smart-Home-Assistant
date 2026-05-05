@@ -4,8 +4,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import io from 'socket.io-client';
 import { Thermometer, Droplets, Sun, Lightbulb, Wind, Maximize2, Bell, Inbox, X, Activity, Cpu, History, Database, User, Volume2, Tv, AirVent } from 'lucide-react';
 import VoiceAssistant from '../components/VoiceAssistant';
+import API_URL from '../config';
 
-const socket = io('http://localhost:8688');
+const socket = io(API_URL);
 
 const Dashboard = ({ user, onLogout }) => {
     const navigate = useNavigate();
@@ -20,11 +21,11 @@ const Dashboard = ({ user, onLogout }) => {
 
     useEffect(() => {
         // Initial fetches
-        fetch('http://localhost:8688/api/logs')
+        fetch(`${API_URL}/api/logs`)
             .then(res => res.json())
             .then(data => setLogs(data));
 
-        fetch('http://localhost:8688/api/sensors/history')
+        fetch(`${API_URL}/api/sensors/history`)
             .then(res => res.json())
             .then(data => {
                 const formattedHistory = data.map(item => ({
@@ -37,7 +38,7 @@ const Dashboard = ({ user, onLogout }) => {
             })
             .catch(err => console.error('Fetch history error:', err));
 
-        fetch('http://localhost:8688/api/status/gateway')
+        fetch(`${API_URL}/api/status/gateway`)
             .then(res => res.json())
             .then(data => {
                 console.log('📡 Initial Gateway Status:', data.status);

@@ -3,6 +3,7 @@ import Fan_off from '../img/fan_off.png';
 import Fan_on from '../img/fan_on.gif';
 
 import io from 'socket.io-client';
+import API_URL from '../config';
 
 
 const Led = ({
@@ -19,7 +20,7 @@ const Led = ({
     bgFan,
     setBgFan
 }) => {
-    const socket = io('http://localhost:8688'); 
+    const socket = io(API_URL); 
 
     useEffect(() => {
         

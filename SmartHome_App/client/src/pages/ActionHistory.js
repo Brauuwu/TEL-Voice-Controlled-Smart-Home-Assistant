@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import API_URL from '../config';
 import { ArrowLeft, History, Lightbulb, Wind, Maximize2, Cpu, Activity, User as UserIcon, Calendar, Clock } from 'lucide-react';
 
 const ActionHistory = () => {
@@ -10,7 +11,7 @@ const ActionHistory = () => {
     const recordsPerPage = 10;
 
     useEffect(() => {
-        fetch('http://localhost:8688/api/logs')
+        fetch(`${API_URL}/api/logs`)
             .then((res) => res.json())
             .then((data) => {
                 setLogs(data);
