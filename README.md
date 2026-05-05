@@ -40,4 +40,4 @@ The system consists of three main components:
 5.  **Frontend**: `cd SmartHome_App/client && npm install && npm start`.
 
 ---
-© 2026 Antigravity Smart Home. All rights reserved.
+© 2026 D22 PTIT TEL Smart Home Assistant System. All rights reserved.

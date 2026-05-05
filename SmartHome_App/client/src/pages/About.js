@@ -48,7 +48,7 @@ const About = ({ user }) => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email Address</span>
-                                        <span className="text-xs font-bold text-slate-700">viethieu2611@gmail.com</span>
+                                        <span className="text-xs font-bold text-slate-700">hieuhoang9713@gmail.com</span>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ const About = ({ user }) => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone Number</span>
-                                        <span className="text-xs font-bold text-slate-700">0936 702 996</span>
+                                        <span className="text-xs font-bold text-slate-700">1900 1296</span>
                                     </div>
                                 </div>
                             </div>
