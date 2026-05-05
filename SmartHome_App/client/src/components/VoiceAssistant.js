@@ -188,25 +188,34 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
     };
 
     return (
-        <div className="fixed bottom-8 right-8 flex flex-col items-end gap-4 z-50">
+        <div className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 flex flex-col items-end gap-4 z-50">
             {transcript && (
-                <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl max-w-xs animate-in slide-in-from-bottom-4 duration-300">
-                    <p className="text-gray-800 text-sm italic">"{transcript}"</p>
+                <div className="bg-white/90 backdrop-blur-xl p-4 rounded-[2rem] shadow-2xl border border-white max-w-[280px] lg:max-w-xs animate-in slide-in-from-bottom-4 duration-300">
+                    <p className="text-slate-600 text-xs lg:text-sm font-bold italic leading-relaxed text-center px-2">"{transcript}"</p>
                 </div>
             )}
             <button
                 onClick={toggleListening}
-                className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg ${
-                    isListening ? 'bg-red-500 animate-pulse scale-110' : 
-                    isSpeaking ? 'bg-blue-500 animate-bounce' : 'bg-indigo-600 hover:bg-indigo-700'
+                className={`w-14 h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${
+                    isListening ? 'bg-rose-500 animate-pulse scale-110 shadow-rose-200' : 
+                    isSpeaking ? 'bg-blue-500 animate-bounce shadow-blue-200' : 'premium-gradient hover:scale-110 active:scale-95 shadow-indigo-200'
                 }`}
             >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                </svg>
+                {isListening ? (
+                    <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce"></span>
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></span>
+                    </div>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 lg:h-8 lg:w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                    </svg>
+                )}
             </button>
         </div>
     );
 };
+
 
 export default VoiceAssistant;

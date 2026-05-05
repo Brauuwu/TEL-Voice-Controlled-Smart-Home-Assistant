@@ -119,57 +119,66 @@ const Dashboard = ({ user, onLogout }) => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 p-8 font-sans">
+        <div className="min-h-screen bg-slate-50 text-slate-900 p-4 lg:p-8 font-sans pb-24 lg:pb-8">
             {/* Header */}
-            <header className="flex justify-between items-center mb-12">
-                <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        Smart Home System
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 lg:mb-12 gap-4">
+                <div className="animate-slide-up">
+                    <h1 className="text-3xl lg:text-4xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
+                        Smart Home
                     </h1>
-                    <p className="text-slate-500 mt-2 font-medium">Welcome back, <span className="text-blue-600 font-bold">{user.username}</span></p>
+                    <p className="text-slate-400 mt-1 text-sm font-bold uppercase tracking-widest">
+                        Hi, <span className="text-indigo-600">{user.username}</span>
+                    </p>
                 </div>
-                <div className="flex items-center gap-4">
-                    {user.role === 'admin' && (
-                        <>
-                            <button 
-                                onClick={() => navigate('/history')}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                            >
-                                <History className="w-4 h-4" />
-                                History
-                            </button>
-                            <button 
-                                onClick={() => navigate('/datasensor')}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                            >
-                                <Database className="w-4 h-4" />
-                                Sensors
-                            </button>
-                            <button 
-                                onClick={() => navigate('/users')}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                            >
-                                <Cpu className="w-4 h-4" />
-                                Users
-                            </button>
-                        </>
-                    )}
-                    <button 
-                        onClick={() => navigate('/about')}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
-                    >
-                        <User className="w-4 h-4" />
-                        About
-                    </button>
-                    <button 
-                        onClick={onLogout}
-                        className="ml-4 px-6 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl hover:bg-rose-600 hover:text-white transition-all font-bold shadow-sm"
-                    >
-                        Logout
-                    </button>
-                    <div className="flex items-center gap-4 bg-white p-2 px-4 rounded-full border border-slate-200 shadow-sm">
-                        <span className={`w-3 h-3 rounded-full ${status === 'online' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`}></span>
-                        <span className="text-sm font-bold text-slate-700">{status === 'online' ? 'Gateway Online' : 'Gateway Offline'}</span>
+                <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                    <div className="hidden lg:flex items-center gap-2">
+                        {user.role === 'admin' && (
+                            <>
+                                <button 
+                                    onClick={() => navigate('/history')}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                >
+                                    <History className="w-4 h-4" />
+                                    History
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/datasensor')}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                >
+                                    <Database className="w-4 h-4" />
+                                    Sensors
+                                </button>
+                                <button 
+                                    onClick={() => navigate('/users')}
+                                    className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                >
+                                    <Cpu className="w-4 h-4" />
+                                    Users
+                                </button>
+                            </>
+                        )}
+                        <button 
+                            onClick={() => navigate('/about')}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                        >
+                            <User className="w-4 h-4" />
+                            About
+                        </button>
+                        <button 
+                            onClick={onLogout}
+                            className="ml-4 px-6 py-2 bg-rose-50 text-rose-600 border border-rose-200 rounded-xl hover:bg-rose-600 hover:text-white transition-all font-bold shadow-sm"
+                        >
+                            Logout
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-white p-1.5 pr-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${status === 'online' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                            <Cpu className={`w-4 h-4 ${status === 'online' ? 'animate-pulse' : ''}`} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                            {status === 'online' ? 'Online' : 'Offline'}
+                        </span>
                     </div>
                     
                     {/* Inbox/Activity Dropdown Container */}
@@ -178,25 +187,28 @@ const Dashboard = ({ user, onLogout }) => {
                             onClick={() => setIsLogOpen(!isLogOpen)}
                             className="relative p-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:bg-slate-50 transition-all shadow-sm group z-10"
                         >
-                            <Bell className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                            <Bell className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                             {logs.length > 0 && (
-                                <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 border-2 border-white rounded-full"></span>
+                                <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-rose-500 border-2 border-white rounded-full"></span>
                             )}
                         </button>
 
                         {isLogOpen && (
-                            <div className="absolute top-16 right-0 w-[380px] bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-right">
-                                <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
+                            <div className="fixed inset-0 lg:absolute lg:inset-auto lg:top-16 lg:right-0 w-full h-full lg:w-[380px] lg:h-auto bg-white lg:rounded-[32px] shadow-2xl border border-slate-100 z-[100] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 lg:origin-top-right">
+                                <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30 safe-top">
                                     <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
                                         <Inbox className="w-5 h-5 text-indigo-600" />
                                         Activity Log
                                     </h2>
-                                    <span className="text-[9px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg uppercase tracking-widest">{logs.length} New</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-[9px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg uppercase tracking-widest">{logs.length} New</span>
+                                        <button onClick={() => setIsLogOpen(false)} className="lg:hidden p-2 text-slate-400"><X size={20}/></button>
+                                    </div>
                                 </div>
                                 
-                                <div className="max-h-[450px] overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                                <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
                                     {logs.length === 0 ? (
-                                        <div className="text-center py-12 text-slate-400 italic text-sm">No recent activity</div>
+                                        <div className="text-center py-20 text-slate-400 italic text-sm">No recent activity</div>
                                     ) : (
                                         logs.map((log, i) => (
                                             <div key={i} className="group p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent bg-white shadow-sm ring-1 ring-slate-100">
@@ -227,7 +239,7 @@ const Dashboard = ({ user, onLogout }) => {
                                 </div>
                                 <button 
                                     onClick={() => setIsLogOpen(false)}
-                                    className="p-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors border-t border-slate-50 w-full text-center"
+                                    className="p-6 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors border-t border-slate-50 w-full text-center safe-bottom"
                                 >
                                     Dismiss All
                                 </button>
@@ -237,18 +249,18 @@ const Dashboard = ({ user, onLogout }) => {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
                 {/* LEFT SECTION (Gauges & Trends) */}
-                <div className="xl:col-span-2 space-y-8">
+                <div className="xl:col-span-2 space-y-6 lg:space-y-8">
                     {/* Gauges */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                        <GaugeCard icon={<Thermometer className="w-6 h-6" />} label="Temperature" value={status === 'online' ? sensors.temperature : '--'} unit="°C" color="from-orange-400 to-red-500" progress={sensors.temperature * 2} />
-                        <GaugeCard icon={<Droplets className="w-6 h-6" />} label="Humidity" value={status === 'online' ? sensors.humidity : '--'} unit="%" color="from-blue-400 to-indigo-500" progress={sensors.humidity} />
-                        <GaugeCard icon={<Sun className="w-6 h-6" />} label="Light" value={status === 'online' ? sensors.ldr : '--'} unit="Lux" color="from-yellow-400 to-orange-500" progress={sensors.ldr / 10} />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                        <GaugeCard icon={<Thermometer className="w-5 h-5 lg:w-6 lg:h-6" />} label="Temp" value={status === 'online' ? sensors.temperature : '--'} unit="°C" color="from-orange-400 to-red-500" progress={sensors.temperature * 2} />
+                        <GaugeCard icon={<Droplets className="w-5 h-5 lg:w-6 lg:h-6" />} label="Humi" value={status === 'online' ? sensors.humidity : '--'} unit="%" color="from-blue-400 to-indigo-500" progress={sensors.humidity} />
+                        <GaugeCard icon={<Sun className="w-5 h-5 lg:w-6 lg:h-6" />} label="Light" value={status === 'online' ? sensors.ldr : '--'} unit="Lux" color="from-yellow-400 to-orange-500" progress={sensors.ldr / 10} />
                         <GaugeCard 
-                            icon={<Activity className="w-6 h-6" />} 
+                            icon={<Activity className="w-5 h-5 lg:w-6 lg:h-6" />} 
                             label="Motion" 
-                            value={status === 'online' ? (sensors.motion ? 'DETECTED' : 'CLEAR') : '--'} 
+                            value={status === 'online' ? (sensors.motion ? 'YES' : 'NO') : '--'} 
                             unit="" 
                             color={sensors.motion ? "from-rose-400 to-rose-600" : "from-emerald-400 to-emerald-600"} 
                             progress={sensors.motion ? 100 : 0} 
@@ -256,53 +268,33 @@ const Dashboard = ({ user, onLogout }) => {
                     </div>
 
                     {/* Expanded Trends */}
-                    <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-slate-200/40">
-                        <h2 className="text-xl font-bold mb-8 text-slate-800 flex items-center gap-2">
-                            <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
-                            Environmental Analytics
-                        </h2>
+                    <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/40 overflow-hidden">
+                        <div className="flex justify-between items-center mb-6 lg:mb-8">
+                            <h2 className="text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
+                                Analytics
+                            </h2>
+                            <div className="flex gap-1">
+                                <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                                <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
+                                <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+                            </div>
+                        </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="h-48">
-                                <h3 className="text-[10px] font-black text-slate-400 mb-4 tracking-widest uppercase">Temperature (°C)</h3>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={history}>
-                                        <defs><linearGradient id="colorTemp" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/><stop offset="95%" stopColor="#f97316" stopOpacity={0}/></linearGradient></defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="time" hide /><YAxis stroke="#cbd5e1" fontSize={10} domain={['auto', 'auto']} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }} /><Area type="monotone" dataKey="temperature" stroke="#f97316" strokeWidth={3} fill="url(#colorTemp)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="h-48">
-                                <h3 className="text-[10px] font-black text-slate-400 mb-4 tracking-widest uppercase text-indigo-500">Humidity (%)</h3>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={history}>
-                                        <defs><linearGradient id="colorHum" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/><stop offset="95%" stopColor="#6366f1" stopOpacity={0}/></linearGradient></defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="time" hide /><YAxis stroke="#cbd5e1" fontSize={10} domain={['auto', 'auto']} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }} /><Area type="monotone" dataKey="humidity" stroke="#6366f1" strokeWidth={3} fill="url(#colorHum)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="h-48">
-                                <h3 className="text-[10px] font-black text-slate-400 mb-4 tracking-widest uppercase text-yellow-500">Light (Lux)</h3>
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={history}>
-                                        <defs><linearGradient id="colorLight" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#eab308" stopOpacity={0.2}/><stop offset="95%" stopColor="#eab308" stopOpacity={0}/></linearGradient></defs>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                        <XAxis dataKey="time" hide /><YAxis stroke="#cbd5e1" fontSize={10} domain={['auto', 'auto']} /><Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }} /><Area type="monotone" dataKey="ldr" stroke="#eab308" strokeWidth={3} fill="url(#colorLight)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
+                            <TrendChart title="Temperature (°C)" data={history} dataKey="temperature" color="#f97316" gradientId="colorTemp" />
+                            <TrendChart title="Humidity (%)" data={history} dataKey="humidity" color="#6366f1" gradientId="colorHum" />
+                            <TrendChart title="Light (Lux)" data={history} dataKey="ldr" color="#eab308" gradientId="colorLight" />
                         </div>
                     </div>
                 </div>
 
                 {/* RIGHT COLUMN (Control Panels) */}
                 <div className="xl:col-span-1 space-y-6">
-                    <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-slate-200/50">
+                    <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/50">
                         <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                                <Lightbulb className="w-6 h-6 text-yellow-500" />
-                                Device Controls
+                            <h2 className="text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                                Controls
                             </h2>
                             <button 
                                 onClick={() => {
@@ -310,137 +302,76 @@ const Dashboard = ({ user, onLogout }) => {
                                     setMode(nextMode);
                                     controlDevice('mode', nextMode);
                                 }}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all font-black text-[10px] tracking-widest uppercase ${
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all font-black text-[9px] tracking-widest uppercase ${
                                     mode === 'auto' 
                                     ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200' 
                                     : 'bg-white border-slate-200 text-slate-400'
                                 }`}
                             >
-                                <Cpu className={`w-4 h-4 ${mode === 'auto' ? 'animate-pulse' : ''}`} />
+                                <Cpu className={`w-3.5 h-3.5 ${mode === 'auto' ? 'animate-pulse' : ''}`} />
                                 {mode}
                             </button>
                         </div>
                         
-                        <div className="space-y-6">
-                            {/* LED Control (Actuator Node) */}
-                            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl transition-all ${devices.led ? 'bg-yellow-100 text-yellow-600 shadow-lg shadow-yellow-100' : 'bg-slate-200 text-slate-400'}`}>
-                                        <Lightbulb className={devices.led ? 'animate-pulse' : ''} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Main LED</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{devices.led ? 'Active' : 'Off'}</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => controlDevice('led', 'TOGGLE')}
-                                    className={`w-14 h-8 rounded-full relative transition-all ${devices.led ? 'bg-indigo-600 shadow-lg shadow-indigo-200' : 'bg-slate-300'}`}
-                                >
-                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${devices.led ? 'left-7' : 'left-1 shadow-sm'}`}></div>
-                                </button>
-                            </div>
+                        <div className="space-y-4 lg:space-y-6">
+                            <DeviceToggle 
+                                icon={<Lightbulb />} 
+                                label="Main LED" 
+                                active={devices.led} 
+                                onClick={() => controlDevice('led', 'TOGGLE')} 
+                                color="yellow"
+                            />
+                            <DeviceToggle 
+                                icon={<Wind />} 
+                                label="Cooling Fan" 
+                                active={devices.fan} 
+                                onClick={() => controlDevice('fan', 'TOGGLE')} 
+                                color="blue"
+                                spin={devices.fan}
+                            />
+                            <DeviceToggle 
+                                icon={<Volume2 />} 
+                                label="Security Buzzer" 
+                                active={devices.buzzer} 
+                                onClick={() => controlDevice('buzzer', 'TOGGLE')} 
+                                color="rose"
+                                bounce={devices.buzzer}
+                            />
 
-                            {/* Fan Control (Center Node - Relay) */}
-                            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl transition-all ${devices.fan ? 'bg-blue-100 text-blue-600 shadow-lg shadow-blue-100' : 'bg-slate-200 text-slate-400'}`}>
-                                        <Wind className={devices.fan ? 'animate-spin' : ''} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Cooling Fan</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{devices.fan ? 'Active' : 'Off'}</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => controlDevice('fan', 'TOGGLE')}
-                                    className={`w-14 h-8 rounded-full relative transition-all ${devices.fan ? 'bg-indigo-600 shadow-lg shadow-indigo-200' : 'bg-slate-300'}`}
-                                >
-                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${devices.fan ? 'left-7' : 'left-1 shadow-sm'}`}></div>
-                                </button>
-                            </div>
-
-                            {/* Buzzer Control (Center Node) */}
-                            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl transition-all ${devices.buzzer ? 'bg-rose-100 text-rose-600 shadow-lg shadow-rose-100' : 'bg-slate-200 text-slate-400'}`}>
-                                        <Volume2 className={devices.buzzer ? 'animate-bounce' : ''} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Security Buzzer</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{devices.buzzer ? 'Active' : 'Off'}</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => controlDevice('buzzer', 'TOGGLE')}
-                                    className={`w-14 h-8 rounded-full relative transition-all ${devices.buzzer ? 'bg-rose-600 shadow-lg shadow-rose-200' : 'bg-slate-300'}`}
-                                >
-                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${devices.buzzer ? 'left-7' : 'left-1 shadow-sm'}`}></div>
-                                </button>
-                            </div>
-
-                            {/* RGB Sliders for Curtain, AC, TV */}
-                            <div className="space-y-4 p-6 rounded-2xl bg-white border border-slate-100 shadow-sm">
-                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Center Node RGB (Curtain/AC/TV)</h3>
+                            {/* RGB Sliders */}
+                            <div className="space-y-6 p-6 rounded-2xl bg-slate-50/50 border border-slate-100">
+                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adjustable Nodes</h3>
                                 
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                                        <div className="flex items-center gap-2">
-                                            <Maximize2 className="w-3.5 h-3.5 text-rose-500" />
-                                            <span>Curtain (Red)</span>
-                                        </div>
-                                        <span className="text-rose-600">{devices.curtain}%</span>
-                                    </div>
-                                    <input 
-                                        type="range" min="0" max="100" 
-                                        value={devices.curtain} 
-                                        onChange={(e) => controlDevice('curtain', parseInt(e.target.value))}
-                                        className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-rose-500" 
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-center text-xs font-bold text-slate-600">
-                                        <div className="flex items-center gap-2">
-                                            <AirVent className="w-3.5 h-3.5 text-emerald-500" />
-                                            <span>Air Conditioner (Green)</span>
-                                        </div>
-                                        <span className="text-emerald-600">{devices.ac}%</span>
-                                    </div>
-                                    <input 
-                                        type="range" min="0" max="100" 
-                                        value={devices.ac} 
-                                        onChange={(e) => controlDevice('ac', parseInt(e.target.value))}
-                                        className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500" 
-                                    />
-                                </div>
+                                <SliderControl 
+                                    icon={<Maximize2 className="text-rose-500" />} 
+                                    label="Curtain" 
+                                    value={devices.curtain} 
+                                    onChange={(val) => controlDevice('curtain', val)}
+                                    color="rose"
+                                />
+                                <SliderControl 
+                                    icon={<AirVent className="text-emerald-500" />} 
+                                    label="AC Unit" 
+                                    value={devices.ac} 
+                                    onChange={(val) => controlDevice('ac', val)}
+                                    color="emerald"
+                                />
                             </div>
 
-                            {/* TV Control (Blue - Switch) */}
-                            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className={`p-3 rounded-xl transition-all ${devices.tv ? 'bg-blue-100 text-blue-600 shadow-lg shadow-blue-100' : 'bg-slate-200 text-slate-400'}`}>
-                                        <Tv className={devices.tv ? 'animate-pulse' : ''} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black text-slate-800 uppercase tracking-tight">Smart TV (Blue)</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{devices.tv ? 'Active' : 'Off'}</p>
-                                    </div>
-                                </div>
-                                <button 
-                                    onClick={() => controlDevice('tv', 'TOGGLE')}
-                                    className={`w-14 h-8 rounded-full relative transition-all ${devices.tv ? 'bg-blue-600 shadow-lg shadow-blue-200' : 'bg-slate-300'}`}
-                                >
-                                    <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all ${devices.tv ? 'left-7' : 'left-1 shadow-sm'}`}></div>
-                                </button>
-                            </div>
+                            <DeviceToggle 
+                                icon={<Tv />} 
+                                label="Smart TV" 
+                                active={devices.tv} 
+                                onClick={() => controlDevice('tv', 'TOGGLE')} 
+                                color="blue"
+                            />
                         </div>
                     </div>
                     
-                    <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                    <div className="premium-gradient rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
                         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
-                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">System Status</h3>
-                        <p className="text-sm font-medium leading-relaxed">AI Voice Assistant is active and ready for your commands.</p>
+                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
+                        <p className="text-sm font-medium leading-relaxed opacity-90">Voice commands are active. Try "Bật đèn" or "Hỏi nhiệt độ".</p>
                     </div>
                 </div>
             </div>
@@ -451,23 +382,20 @@ const Dashboard = ({ user, onLogout }) => {
                 status={status}
             />
 
-            {/* COMPACT ACTIVITY TOAST (TOP RIGHT) */}
+            {/* COMPACT ACTIVITY TOAST */}
             {latestActivity && (
-                <div className="fixed top-24 right-8 z-[110] animate-slide-in-right">
-                    <div className="bg-slate-900/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 ring-1 ring-black/5">
+                <div className="fixed top-6 lg:top-24 right-4 lg:right-8 z-[110] animate-slide-in-right">
+                    <div className="bg-slate-900/90 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 ring-1 ring-black/5">
                         <div className={`p-2 rounded-xl ${latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === 'ONLINE' || latestActivity.action === true ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'} shadow-lg`}>
                             {getDeviceIcon(latestActivity.device)}
                         </div>
                         <div className="flex flex-col">
-                            <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{latestActivity.device}</p>
+                            <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{latestActivity.device}</p>
                             <p className="text-xs font-bold leading-none">
                                 {typeof latestActivity.action === 'number' || !isNaN(latestActivity.action) && latestActivity.action !== 'ON' && latestActivity.action !== 'OFF' 
-                                    ? `Adjusted to ${latestActivity.action}%` 
-                                    : (latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === true ? 'Switched ON' : 'Switched OFF')}
+                                    ? `Set to ${latestActivity.action}%` 
+                                    : (latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === true ? 'ON' : 'OFF')}
                             </p>
-                        </div>
-                        <div className="ml-2 pl-3 border-l border-white/10">
-                            <p className="text-[10px] text-slate-500 font-medium whitespace-nowrap">By {latestActivity.username === 'auto' ? 'AI' : latestActivity.username}</p>
                         </div>
                     </div>
                 </div>
@@ -477,17 +405,17 @@ const Dashboard = ({ user, onLogout }) => {
 };
 
 const GaugeCard = ({ icon, label, value, unit, color, progress }) => (
-    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl shadow-slate-200/40 relative overflow-hidden group transition-all duration-300 hover:shadow-2xl">
+    <div className="bg-white border border-slate-200 rounded-[2rem] p-4 lg:p-6 shadow-xl shadow-slate-200/40 relative overflow-hidden group transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
         <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${color} opacity-5 blur-2xl group-hover:opacity-10 transition-opacity`}></div>
-        <div className="flex justify-between items-start relative z-10">
-            <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-                <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-slate-800 tracking-tight">{value}</span>
-                    <span className="text-sm font-bold text-slate-400">{unit}</span>
-                </div>
+        <div className="flex justify-between items-start relative z-10 mb-4 lg:mb-6">
+            <div className={`p-2 lg:p-3 rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>{icon}</div>
+        </div>
+        <div className="relative z-10">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+            <div className="flex items-baseline gap-1">
+                <span className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight">{value}</span>
+                <span className="text-[10px] font-bold text-slate-400 uppercase">{unit}</span>
             </div>
-            <div className={`p-3 rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>{icon}</div>
         </div>
         <div className="mt-4 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
             <div className={`h-full bg-gradient-to-r ${color} transition-all duration-1000`} style={{ width: `${Math.min(Math.max(progress, 0), 100)}%` }}></div>
@@ -495,29 +423,84 @@ const GaugeCard = ({ icon, label, value, unit, color, progress }) => (
     </div>
 );
 
-const StatCard = ({ title, value, icon, color }) => (
-    <div className={`p-6 rounded-3xl bg-white border border-slate-200 shadow-lg overflow-hidden relative group transition-all duration-300 hover:shadow-xl hover:-translate-y-1`}>
-        <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${color} opacity-5 blur-2xl group-hover:opacity-10 transition-opacity`}></div>
-        <div className="flex justify-between items-start">
-            <div>
-                <p className="text-slate-500 text-sm font-bold mb-1 uppercase tracking-wider">{title}</p>
-                <p className="text-3xl font-black text-slate-800">{value}</p>
-            </div>
-            <div className="text-4xl grayscale group-hover:grayscale-0 transition-all drop-shadow-sm">{icon}</div>
-        </div>
+const TrendChart = ({ title, data, dataKey, color, gradientId }) => (
+    <div className="h-40 lg:h-48">
+        <h3 className="text-[10px] font-black text-slate-400 mb-4 tracking-widest uppercase" style={{ color: color }}>{title}</h3>
+        <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data}>
+                <defs>
+                    <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor={color} stopOpacity={0}/>
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="time" hide />
+                <YAxis stroke="#cbd5e1" fontSize={10} domain={['auto', 'auto']} tickLine={false} axisLine={false} />
+                <Tooltip 
+                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', fontSize: '12px', fontWeight: 'bold' }}
+                    itemStyle={{ color: color }}
+                />
+                <Area type="monotone" dataKey={dataKey} stroke={color} strokeWidth={3} fill={`url(#${gradientId})`} />
+            </AreaChart>
+        </ResponsiveContainer>
     </div>
 );
 
-const ControlSwitch = ({ label, active, onToggle }) => (
-    <div className="flex justify-between items-center p-4 rounded-2xl bg-slate-50 border border-slate-100">
-        <span className="text-sm font-bold text-slate-600">{label}</span>
-        <button 
-            onClick={onToggle}
-            className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${active ? 'bg-indigo-600 shadow-md shadow-indigo-200' : 'bg-slate-300'}`}
-        >
-            <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all duration-300 ${active ? 'left-7' : 'left-1 shadow-sm'}`}></div>
-        </button>
-    </div>
-);
+const DeviceToggle = ({ icon, label, active, onClick, color, spin, bounce }) => {
+    const colors = {
+        yellow: 'bg-yellow-100 text-yellow-600 shadow-yellow-100',
+        blue: 'bg-blue-100 text-blue-600 shadow-blue-100',
+        rose: 'bg-rose-100 text-rose-600 shadow-rose-100',
+        indigo: 'bg-indigo-100 text-indigo-600 shadow-indigo-100',
+    };
+
+    return (
+        <div className="p-4 lg:p-6 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between group hover:shadow-md transition-all">
+            <div className="flex items-center gap-4">
+                <div className={`p-3 rounded-xl transition-all ${active ? colors[color] + ' shadow-lg' : 'bg-slate-200 text-slate-400'}`}>
+                    {React.cloneElement(icon, { className: `w-5 h-5 ${spin ? 'animate-spin' : ''} ${bounce ? 'animate-bounce' : ''} ${active && !spin && !bounce ? 'animate-pulse' : ''}` })}
+                </div>
+                <div>
+                    <p className="text-xs lg:text-sm font-black text-slate-800 uppercase tracking-tight">{label}</p>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">{active ? 'Active' : 'Off'}</p>
+                </div>
+            </div>
+            <button 
+                onClick={onClick}
+                className={`w-12 lg:w-14 h-7 lg:h-8 rounded-full relative transition-all ${active ? 'bg-indigo-600 shadow-lg shadow-indigo-200' : 'bg-slate-300'}`}
+            >
+                <div className={`absolute top-1 w-5 lg:w-6 h-5 lg:h-6 bg-white rounded-full transition-all ${active ? 'left-6 lg:left-7' : 'left-1 shadow-sm'}`}></div>
+            </button>
+        </div>
+    );
+};
+
+const SliderControl = ({ icon, label, value, onChange, color }) => {
+    const accentColors = {
+        rose: 'accent-rose-500',
+        emerald: 'accent-emerald-500',
+        indigo: 'accent-indigo-500'
+    };
+
+    return (
+        <div className="space-y-2">
+            <div className="flex justify-between items-center text-[10px] lg:text-xs font-bold text-slate-600">
+                <div className="flex items-center gap-2">
+                    {React.cloneElement(icon, { className: 'w-3.5 h-3.5' })}
+                    <span className="uppercase tracking-tight">{label}</span>
+                </div>
+                <span className={`font-black ${color === 'rose' ? 'text-rose-600' : 'text-emerald-600'}`}>{value}%</span>
+            </div>
+            <input 
+                type="range" min="0" max="100" 
+                value={value} 
+                onChange={(e) => onChange(parseInt(e.target.value))}
+                className={`w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer ${accentColors[color]}`} 
+            />
+        </div>
+    );
+};
+
 
 export default Dashboard;
