@@ -131,8 +131,8 @@ void drawAP(IPAddress ip) {
   tft.print("Wi-Fi:");
   
   tft.setTextColor(ST77XX_YELLOW);
-  tft.setCursor(45, 50);
-  tft.print("Garden_Config");
+  tft.setCursor(20, 60);
+  tft.print("SmartHome_Config");
 
   tft.setTextColor(ST77XX_WHITE);
   tft.setCursor(5, 75);
@@ -146,7 +146,7 @@ void drawAP(IPAddress ip) {
   tft.setCursor(5, 100);
   tft.print("IP Address:");
   
-  tft.setTextColor(ST77XX_GREEN);
-  tft.setCursor(5, 120);
+  tft.setTextColor(ST77XX_WHITE);
+  tft.setCursor(30, 115);
   tft.print(ip);
 }
