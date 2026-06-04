@@ -147,7 +147,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
 <body>
   <div class="container">
     <div class="header">
-      <h1>Smart Garden</h1>
+      <h1>Smart Home</h1>
       <p>Wi-Fi Configuration</p>
     </div>
     
