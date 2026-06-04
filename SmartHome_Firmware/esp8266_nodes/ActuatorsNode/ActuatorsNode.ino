@@ -52,10 +52,41 @@ void setup() {
   Serial.println("Actuators Node Started...");
 }
 
+unsigned long lastReceived = 0;    // Last time we received data from Gateway
+bool gatewayConnected = false;     // Whether Gateway is connected
+#define GW_TIMEOUT 5000            // 5 seconds timeout
+
+void drawLossConnection() {
+  display.clearDisplay();
+  
+  // Border
+  display.drawRect(0, 0, 128, 64, WHITE);
+  
+  // Warning icon (triangle with !)
+  display.setCursor(52, 5);
+  display.setTextSize(2);
+  display.print("!");
+  
+  // Title
+  display.setTextSize(1);
+  display.setCursor(10, 25);
+  display.print("LOSS CONNECTION");
+  
+  // Subtitle with animated dots
+  display.setCursor(16, 40);
+  display.print("Waiting for GW");
+  int dots = (millis() / 500) % 4;
+  for (int i = 0; i < dots; i++) display.print(".");
+  
+  display.display();
+}
+
 void loop() {
   if (radio.available()) {
     PayloadNode2 data;
     radio.read(&data, sizeof(data));
+    lastReceived = millis();
+    gatewayConnected = true;
     
     Serial.print("Received Data - LED: "); Serial.println(data.ledState);
     digitalWrite(LED_PIN, data.ledState ? HIGH : LOW);
@@ -74,5 +105,16 @@ void loop() {
     display.print("Temp: "); display.print(data.temp); display.println(" C");
     
     display.display();
+  }
+
+  // Check Gateway timeout
+  if (lastReceived > 0 && millis() - lastReceived > GW_TIMEOUT) {
+    gatewayConnected = false;
+  }
+  
+  // Show loss connection screen if Gateway is disconnected
+  if (!gatewayConnected) {
+    drawLossConnection();
+    delay(200); // Small delay for animation
   }
 }

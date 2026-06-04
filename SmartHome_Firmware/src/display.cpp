@@ -45,7 +45,7 @@ void drawBoot() {
   tft.print("Initializing...");
 }
 
-void drawDashboard(PayloadNode1 n1, float light, bool wifiOk, int rssi, bool mqttOk, ControlMode mode, bool fanOn, bool ledOn, bool heatOn, bool pumpOn, bool mistOn) {
+void drawDashboard(PayloadNode1 n1, float light, bool wifiOk, int rssi, bool mqttOk, ControlMode mode, bool fanOn, bool ledOn, bool heatOn, bool pumpOn, bool mistOn, bool sensorNodeOk) {
   tft.fillScreen(ST77XX_BLACK);
 
   // --- 1. STATUS ---
@@ -68,9 +68,14 @@ void drawDashboard(PayloadNode1 n1, float light, bool wifiOk, int rssi, bool mqt
   tft.print("[DASHBOARD]");
   
   tft.setTextColor(ST77XX_ORANGE);
-  tft.setCursor(5, 32); tft.print("T:"); tft.setTextColor(ST77XX_WHITE); tft.print(n1.temp, 1); tft.print("C");
+  tft.setCursor(5, 32); tft.print("T:");
+  if (sensorNodeOk) { tft.setTextColor(ST77XX_WHITE); tft.print(n1.temp, 1); tft.print("C"); }
+  else { tft.setTextColor(ST77XX_RED); tft.print("--"); }
+
   tft.setTextColor(0x07FF); // Cyan
-  tft.setCursor(65, 32); tft.print("H:"); tft.setTextColor(ST77XX_WHITE); tft.print(n1.hum, 1); tft.print("%");
+  tft.setCursor(65, 32); tft.print("H:");
+  if (sensorNodeOk) { tft.setTextColor(ST77XX_WHITE); tft.print(n1.hum, 1); tft.print("%"); }
+  else { tft.setTextColor(ST77XX_RED); tft.print("--"); }
   
   tft.setTextColor(ST77XX_YELLOW);
   tft.setCursor(5, 45); tft.print("L:"); tft.setTextColor(ST77XX_WHITE); tft.print(light, 0); tft.print("lx");
@@ -89,7 +94,8 @@ void drawDashboard(PayloadNode1 n1, float light, bool wifiOk, int rssi, bool mqt
 
   tft.setTextColor(ST77XX_WHITE);
   tft.setCursor(5, 90); tft.print("PIR :");
-  if (n1.motion) { tft.setTextColor(ST77XX_RED); tft.print("MOTION!"); } 
+  if (!sensorNodeOk) { tft.setTextColor(ST77XX_RED); tft.print("--"); }
+  else if (n1.motion) { tft.setTextColor(ST77XX_RED); tft.print("MOTION!"); } 
   else { tft.setTextColor(ST77XX_GREEN); tft.print("Clear"); }
 
   tft.drawFastHLine(0, 103, 128, ST77XX_WHITE); // Divider

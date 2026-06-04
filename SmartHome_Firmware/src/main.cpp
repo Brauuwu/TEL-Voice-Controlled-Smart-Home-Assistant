@@ -20,6 +20,10 @@ bool pumpStatus = false;
 bool mistStatus = false;
 bool bootFinished = false;
 
+unsigned long lastNrfNode1 = 0;   // Last time we received data from Sensor Node
+bool sensorNodeConnected = false; // Whether Sensor Node is connected
+#define NRF_TIMEOUT 5000          // 5 seconds timeout
+
 void onCommand(String topic, String message) {
   JsonDocument doc;
   deserializeJson(doc, message);
@@ -106,6 +110,13 @@ void loop() {
   // Read NRF Sensors Node
   if (nrfAvailable()) {
     nrfRead(n1);
+    lastNrfNode1 = millis();
+    sensorNodeConnected = true;
+  }
+
+  // Check Sensor Node timeout
+  if (millis() - lastNrfNode1 > NRF_TIMEOUT) {
+    sensorNodeConnected = false;
   }
 
   float ldr = readLight();
@@ -125,7 +136,7 @@ void loop() {
   if (millis() - lastScreenUpdate > 1000) {
     lastScreenUpdate = millis();
     mqttPublishTelemetry(n1, ldr, sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus);
-    drawDashboard(n1, ldr, isWifiConnected(), getWifiRSSI(), isMqttConnected(), sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus);
+    drawDashboard(n1, ldr, isWifiConnected(), getWifiRSSI(), isMqttConnected(), sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected);
     buzzerAlert(n1.temp, n1.motion);
   }
 }
