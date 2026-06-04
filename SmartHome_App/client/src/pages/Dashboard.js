@@ -19,6 +19,7 @@ const Dashboard = ({ user, onLogout }) => {
     const [isLogOpen, setIsLogOpen] = useState(false);
     const [latestActivity, setLatestActivity] = useState(null);
     const [mode, setMode] = useState('manual');
+    const [mobileTab, setMobileTab] = useState('overview'); // 'overview' | 'controls'
 
     useEffect(() => {
         // Initial fetches
@@ -308,11 +309,33 @@ const Dashboard = ({ user, onLogout }) => {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+            {/* MOBILE PAGE TABS */}
+            <div className="lg:hidden flex bg-slate-200/50 p-1.5 rounded-2xl mb-6">
+                <button
+                    onClick={() => setMobileTab('overview')}
+                    className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                        mobileTab === 'overview' ? 'bg-white text-indigo-600 shadow-sm ring-1 ring-slate-900/5' : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <Activity className="w-4 h-4" />
+                    Overview
+                </button>
+                <button
+                    onClick={() => setMobileTab('controls')}
+                    className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                        mobileTab === 'controls' ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-900/5' : 'text-slate-400 hover:text-slate-600'
+                    }`}
+                >
+                    <Cpu className="w-4 h-4" />
+                    Controls
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8 pb-24 lg:pb-0">
                 {/* LEFT COLUMN — Sensors & Analytics */}
-                <div className="xl:col-span-2 space-y-6 lg:space-y-8">
+                <div className={`contents xl:block xl:col-span-2 space-y-0 xl:space-y-8 ${mobileTab === 'overview' ? 'block' : 'hidden lg:contents'}`}>
                     {/* Sensor Gauges */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div className="order-1 xl:order-none w-full grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                         <GaugeCard icon={<Thermometer className="w-5 h-5 lg:w-6 lg:h-6" />} label="Temp" value={status === 'online' ? sensors.temperature : '--'} unit="°C" color="from-orange-400 to-red-500" progress={sensors.temperature * 2} />
                         <GaugeCard icon={<Droplets className="w-5 h-5 lg:w-6 lg:h-6" />} label="Humi" value={status === 'online' ? sensors.humidity : '--'} unit="%" color="from-blue-400 to-indigo-500" progress={sensors.humidity} />
                         <GaugeCard icon={<Sun className="w-5 h-5 lg:w-6 lg:h-6" />} label="Light" value={status === 'online' ? sensors.ldr : '--'} unit="Lux" color="from-yellow-400 to-orange-500" progress={sensors.ldr / 10} />
@@ -327,7 +350,7 @@ const Dashboard = ({ user, onLogout }) => {
                     </div>
 
                     {/* Analytics */}
-                    <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/40 overflow-hidden">
+                    <div className="order-3 xl:order-none w-full bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/40 overflow-hidden">
                         <div className="flex justify-between items-center mb-6 lg:mb-8">
                             <h2 className="text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2">
                                 <span className="w-1.5 h-6 bg-indigo-600 rounded-full"></span>
@@ -347,7 +370,7 @@ const Dashboard = ({ user, onLogout }) => {
                     </div>
                     
                     {/* AI Assistant */}
-                    <div className="premium-gradient rounded-[2rem] p-6 lg:p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                    <div className="order-4 xl:order-none w-full premium-gradient rounded-[2rem] p-6 lg:p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
                         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
                         <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
                         <p className="text-sm font-medium leading-relaxed opacity-90">Voice commands are active. Try "Bật đèn", "Tăng độ sáng", "Điều hòa 24 độ" or "Hỏi nhiệt độ".</p>
@@ -355,7 +378,7 @@ const Dashboard = ({ user, onLogout }) => {
                 </div>
 
                 {/* RIGHT COLUMN — Device Controls */}
-                <div className="xl:col-span-1 space-y-6">
+                <div className={`xl:col-span-1 order-2 xl:order-none w-full space-y-6 ${mobileTab === 'controls' ? 'block' : 'hidden lg:block'}`}>
                     {/* Quick Toggles */}
                     <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/50">
                         <div className="flex justify-between items-center mb-6">
