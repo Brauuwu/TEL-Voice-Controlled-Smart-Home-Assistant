@@ -15,6 +15,7 @@ const Dashboard = ({ user, onLogout }) => {
     const [devices, setDevices] = useState({ led: false, fan: false, buzzer: false, curtain: 0, ac: 0, tv: false });
     const [logs, setLogs] = useState([]);
     const [status, setStatus] = useState('offline');
+    const [nodeStatus, setNodeStatus] = useState({ sensorNode: false, actuatorNode: false });
     const [isLogOpen, setIsLogOpen] = useState(false);
     const [latestActivity, setLatestActivity] = useState(null);
     const [mode, setMode] = useState('manual');
@@ -50,6 +51,12 @@ const Dashboard = ({ user, onLogout }) => {
         socket.on('sensor_update', (data) => {
             setSensors(data);
             if (data.mode) setMode(data.mode);
+            if (data.sensorNode !== undefined || data.actuatorNode !== undefined) {
+                setNodeStatus(prev => ({
+                    sensorNode: data.sensorNode ?? prev.sensorNode,
+                    actuatorNode: data.actuatorNode ?? prev.actuatorNode
+                }));
+            }
             setHistory(prev => [...prev.slice(-19), { time: new Date().toLocaleTimeString(), ...data }]);
         });
 
@@ -172,13 +179,19 @@ const Dashboard = ({ user, onLogout }) => {
                         </button>
                     </div>
 
-                    <div className="flex items-center gap-3 bg-white p-1.5 pr-4 rounded-2xl border border-slate-200 shadow-sm">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${status === 'online' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
-                            <Cpu className={`w-4 h-4 ${status === 'online' ? 'animate-pulse' : ''}`} />
+                    <div className="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl ${status === 'online' ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                            <Cpu className={`w-3.5 h-3.5 ${status === 'online' ? 'text-emerald-500 animate-pulse' : 'text-rose-400'}`} />
+                            <span className={`text-[8px] font-black uppercase tracking-widest ${status === 'online' ? 'text-emerald-600' : 'text-rose-500'}`}>GW</span>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
-                            {status === 'online' ? 'Online' : 'Offline'}
-                        </span>
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl ${nodeStatus.sensorNode ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                            <Thermometer className={`w-3.5 h-3.5 ${nodeStatus.sensorNode ? 'text-emerald-500' : 'text-rose-400'}`} />
+                            <span className={`text-[8px] font-black uppercase tracking-widest ${nodeStatus.sensorNode ? 'text-emerald-600' : 'text-rose-500'}`}>Sensor</span>
+                        </div>
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl ${nodeStatus.actuatorNode ? 'bg-emerald-50' : 'bg-rose-50'}`}>
+                            <Lightbulb className={`w-3.5 h-3.5 ${nodeStatus.actuatorNode ? 'text-emerald-500' : 'text-rose-400'}`} />
+                            <span className={`text-[8px] font-black uppercase tracking-widest ${nodeStatus.actuatorNode ? 'text-emerald-600' : 'text-rose-500'}`}>Actuator</span>
+                        </div>
                     </div>
 
                     {/* Inbox/Activity Dropdown Container */}

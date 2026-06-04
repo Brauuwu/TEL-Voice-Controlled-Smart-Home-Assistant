@@ -4,4 +4,4 @@
 void nrfInit();
 bool nrfAvailable();
 void nrfRead(PayloadNode1 &data);
-void nrfWriteNode2(PayloadNode2 &data);
+bool nrfWriteNode2(PayloadNode2 &data);

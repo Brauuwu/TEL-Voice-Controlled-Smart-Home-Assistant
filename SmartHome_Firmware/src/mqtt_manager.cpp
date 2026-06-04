@@ -49,7 +49,7 @@ bool isMqttConnected() {
   return mqttClient.connected();
 }
 
-void mqttPublishTelemetry(PayloadNode1 n1, float light, ControlMode mode, bool fan, bool led, bool heater, bool pump, bool mist) {
+void mqttPublishTelemetry(PayloadNode1 n1, float light, ControlMode mode, bool fan, bool led, bool heater, bool pump, bool mist, bool sensorNode, bool actuatorNode) {
   if (!isMqttConnected()) return;
   
   String mStr = (mode == MODE_AUTO) ? "auto" : "manual";
@@ -63,7 +63,9 @@ void mqttPublishTelemetry(PayloadNode1 n1, float light, ControlMode mode, bool f
                    ",\"led\":" + String(led ? "true" : "false") + 
                    ",\"heater\":" + String(heater ? "true" : "false") + 
                    ",\"pump\":" + String(pump ? "true" : "false") + 
-                   ",\"mist\":" + String(mist ? "true" : "false") + "}";
+                   ",\"mist\":" + String(mist ? "true" : "false") + 
+                   ",\"sensorNode\":" + String(sensorNode ? "true" : "false") + 
+                   ",\"actuatorNode\":" + String(actuatorNode ? "true" : "false") + "}";
                    
   mqttClient.publish("smarthome/sensors", payload.c_str());
 }

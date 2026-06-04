@@ -22,6 +22,7 @@ bool bootFinished = false;
 
 unsigned long lastNrfNode1 = 0;   // Last time we received data from Sensor Node
 bool sensorNodeConnected = false; // Whether Sensor Node is connected
+bool actuatorNodeConnected = false; // Whether Actuator Node is connected
 #define NRF_TIMEOUT 5000          // 5 seconds timeout
 
 void onCommand(String topic, String message) {
@@ -130,12 +131,12 @@ void loop() {
     n2.light = ldr;
     n2.motion = n1.motion;
     n2.ledState = ledStatus;
-    nrfWriteNode2(n2);
+    actuatorNodeConnected = nrfWriteNode2(n2);
   }
 
   if (millis() - lastScreenUpdate > 1000) {
     lastScreenUpdate = millis();
-    mqttPublishTelemetry(n1, ldr, sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus);
+    mqttPublishTelemetry(n1, ldr, sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected, actuatorNodeConnected);
     drawDashboard(n1, ldr, isWifiConnected(), getWifiRSSI(), isMqttConnected(), sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected);
     buzzerAlert(n1.temp, n1.motion);
   }

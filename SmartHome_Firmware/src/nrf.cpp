@@ -23,8 +23,9 @@ void nrfRead(PayloadNode1 &data) {
   radio.read(&data, sizeof(data));
 }
 
-void nrfWriteNode2(PayloadNode2 &data) {
+bool nrfWriteNode2(PayloadNode2 &data) {
   radio.stopListening();
-  radio.write(&data, sizeof(data));
+  bool success = radio.write(&data, sizeof(data));
   radio.startListening();
+  return success;
 }
