@@ -207,14 +207,16 @@ const Dashboard = ({ user, onLogout }) => {
                         </button>
 
                         {isLogOpen && (
-                            <div className="fixed inset-0 lg:absolute lg:inset-auto lg:top-16 lg:right-0 w-full h-full lg:w-[380px] lg:h-auto bg-white lg:rounded-[32px] shadow-2xl border border-slate-100 z-[100] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 lg:origin-top-right">
+                            <div className="fixed inset-0 lg:absolute lg:inset-auto lg:top-16 lg:right-0 w-full h-full lg:w-[380px] lg:h-auto lg:max-h-[520px] bg-white lg:rounded-[32px] shadow-2xl border border-slate-100 z-[100] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200 lg:origin-top-right">
                                 <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30 safe-top">
                                     <h2 className="text-lg font-black text-slate-800 flex items-center gap-2">
                                         <Inbox className="w-5 h-5 text-indigo-600" />
                                         Activity Log
                                     </h2>
                                     <div className="flex items-center gap-2">
-                                        <span className="text-[9px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg uppercase tracking-widest">{logs.length} New</span>
+                                        <span className="text-[9px] font-black bg-indigo-100 text-indigo-600 px-2 py-1 rounded-lg uppercase tracking-widest">
+                                            {logs.length > 8 ? `8 / ${logs.length}` : `${logs.length} New`}
+                                        </span>
                                         <button onClick={() => setIsLogOpen(false)} className="lg:hidden p-2 text-slate-400"><X size={20} /></button>
                                     </div>
                                 </div>
@@ -223,7 +225,7 @@ const Dashboard = ({ user, onLogout }) => {
                                     {logs.length === 0 ? (
                                         <div className="text-center py-20 text-slate-400 italic text-sm">No recent activity</div>
                                     ) : (
-                                        logs.map((log, i) => (
+                                        logs.slice(0, 8).map((log, i) => (
                                             <div key={i} className="group p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent bg-white shadow-sm ring-1 ring-slate-100">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div className="text-xs font-black text-slate-800 flex items-center gap-2">
@@ -250,12 +252,22 @@ const Dashboard = ({ user, onLogout }) => {
                                         ))
                                     )}
                                 </div>
-                                <button
-                                    onClick={() => setIsLogOpen(false)}
-                                    className="p-6 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors border-t border-slate-50 w-full text-center safe-bottom"
-                                >
-                                    Dismiss All
-                                </button>
+                                <div className="flex border-t border-slate-50 safe-bottom">
+                                    {user.role === 'admin' && (
+                                        <button
+                                            onClick={() => { setIsLogOpen(false); navigate('/history'); }}
+                                            className="flex-1 p-4 text-xs font-bold text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 transition-colors text-center"
+                                        >
+                                            View All →
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => setIsLogOpen(false)}
+                                        className="flex-1 p-4 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors text-center"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
