@@ -309,9 +309,9 @@ const Dashboard = ({ user, onLogout }) => {
             </header>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-                {/* LEFT SECTION (Gauges & Trends) */}
+                {/* LEFT COLUMN — Sensors & Analytics */}
                 <div className="xl:col-span-2 space-y-6 lg:space-y-8">
-                    {/* Gauges */}
+                    {/* Sensor Gauges */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                         <GaugeCard icon={<Thermometer className="w-5 h-5 lg:w-6 lg:h-6" />} label="Temp" value={status === 'online' ? sensors.temperature : '--'} unit="°C" color="from-orange-400 to-red-500" progress={sensors.temperature * 2} />
                         <GaugeCard icon={<Droplets className="w-5 h-5 lg:w-6 lg:h-6" />} label="Humi" value={status === 'online' ? sensors.humidity : '--'} unit="%" color="from-blue-400 to-indigo-500" progress={sensors.humidity} />
@@ -326,7 +326,7 @@ const Dashboard = ({ user, onLogout }) => {
                         />
                     </div>
 
-                    {/* Expanded Trends */}
+                    {/* Analytics */}
                     <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/40 overflow-hidden">
                         <div className="flex justify-between items-center mb-6 lg:mb-8">
                             <h2 className="text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2">
@@ -345,15 +345,23 @@ const Dashboard = ({ user, onLogout }) => {
                             <TrendChart title="Light (Lux)" data={history} dataKey="ldr" color="#eab308" gradientId="colorLight" />
                         </div>
                     </div>
+                    
+                    {/* AI Assistant */}
+                    <div className="premium-gradient rounded-[2rem] p-6 lg:p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
+                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
+                        <p className="text-sm font-medium leading-relaxed opacity-90">Voice commands are active. Try "Bật đèn", "Tăng độ sáng", "Điều hòa 24 độ" or "Hỏi nhiệt độ".</p>
+                    </div>
                 </div>
 
-                {/* RIGHT COLUMN (Control Panels) */}
+                {/* RIGHT COLUMN — Device Controls */}
                 <div className="xl:col-span-1 space-y-6">
+                    {/* Quick Toggles */}
                     <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/50">
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-lg lg:text-xl font-bold text-slate-800 flex items-center gap-2">
-                                <Lightbulb className="w-5 h-5 text-yellow-500" />
-                                Controls
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-base lg:text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                                Quick Toggles
                             </h2>
                             <button
                                 onClick={() => {
@@ -370,21 +378,7 @@ const Dashboard = ({ user, onLogout }) => {
                                 {mode}
                             </button>
                         </div>
-
-                        <div className="space-y-4 lg:space-y-6">
-                            <SegmentedControl
-                                icon={<Lightbulb />}
-                                label="Main LED"
-                                value={devices.led}
-                                options={[
-                                    { label: 'Tắt', value: 0 },
-                                    { label: 'Yếu', value: 1 },
-                                    { label: 'Vừa', value: 2 },
-                                    { label: 'Max', value: 3 }
-                                ]}
-                                onChange={(val) => controlDevice('led', val)}
-                                color="yellow"
-                            />
+                        <div className="space-y-4">
                             <DeviceToggle
                                 icon={<Wind />}
                                 label="Cooling Fan"
@@ -401,35 +395,6 @@ const Dashboard = ({ user, onLogout }) => {
                                 color="rose"
                                 bounce={devices.buzzer}
                             />
-
-                            {/* Adjustable Devices */}
-                            <div className="space-y-6 p-6 rounded-2xl bg-slate-50/50 border border-slate-100">
-                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adjustable Nodes</h3>
-
-                                <SegmentedControl
-                                    icon={<Maximize2 />}
-                                    label="Curtain"
-                                    value={devices.curtain}
-                                    options={[
-                                        { label: 'Đóng', value: 0 },
-                                        { label: 'Vừa', value: 50 },
-                                        { label: 'Mở', value: 100 }
-                                    ]}
-                                    onChange={(val) => controlDevice('curtain', val)}
-                                    color="rose"
-                                />
-                                <StepperControl
-                                    icon={<AirVent />}
-                                    label="AC Unit"
-                                    value={devices.ac}
-                                    min={20}
-                                    max={29}
-                                    unit="°C"
-                                    onChange={(val) => controlDevice('ac', val)}
-                                    color="emerald"
-                                />
-                            </div>
-
                             <DeviceToggle
                                 icon={<Tv />}
                                 label="Smart TV"
@@ -440,10 +405,51 @@ const Dashboard = ({ user, onLogout }) => {
                         </div>
                     </div>
 
-                    <div className="premium-gradient rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
-                        <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
-                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
-                        <p className="text-sm font-medium leading-relaxed opacity-90">Voice commands are active. Try "Bật đèn" or "Hỏi nhiệt độ".</p>
+                    {/* Level Controls */}
+                    <div className="bg-white border border-slate-200 rounded-[2rem] p-6 lg:p-8 shadow-xl shadow-slate-200/50">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-base lg:text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <span className="w-1.5 h-6 bg-yellow-500 rounded-full"></span>
+                                Level Controls
+                            </h2>
+                        </div>
+                        <div className="space-y-4">
+                            <SegmentedControl
+                                icon={<Lightbulb />}
+                                label="Main LED"
+                                value={devices.led}
+                                options={[
+                                    { label: 'Tắt', value: 0 },
+                                    { label: 'Yếu', value: 1 },
+                                    { label: 'Vừa', value: 2 },
+                                    { label: 'Max', value: 3 }
+                                ]}
+                                onChange={(val) => controlDevice('led', val)}
+                                color="yellow"
+                            />
+                            <SegmentedControl
+                                icon={<Maximize2 />}
+                                label="Curtain"
+                                value={devices.curtain}
+                                options={[
+                                    { label: 'Đóng', value: 0 },
+                                    { label: 'Vừa', value: 50 },
+                                    { label: 'Mở', value: 100 }
+                                ]}
+                                onChange={(val) => controlDevice('curtain', val)}
+                                color="rose"
+                            />
+                            <StepperControl
+                                icon={<AirVent />}
+                                label="AC Unit"
+                                value={devices.ac}
+                                min={20}
+                                max={29}
+                                unit="°C"
+                                onChange={(val) => controlDevice('ac', val)}
+                                color="emerald"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
