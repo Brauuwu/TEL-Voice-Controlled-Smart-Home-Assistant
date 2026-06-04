@@ -452,6 +452,7 @@ const Dashboard = ({ user, onLogout }) => {
                 onCommand={(cmd) => controlDevice(cmd.device, cmd.action, cmd.type)}
                 sensors={sensors}
                 status={status}
+                devices={devices}
             />
 
             {/* COMPACT ACTIVITY TOAST */}

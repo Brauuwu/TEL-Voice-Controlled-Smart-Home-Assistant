@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { VOICE_URL } from '../config';
 
-const VoiceAssistant = ({ onCommand, sensors, status }) => {
+const VoiceAssistant = ({ onCommand, sensors, status, devices }) => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
@@ -12,6 +12,7 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
     const isSpeakingRef = useRef(isSpeaking);
     const isListeningRef = useRef(isListening);
     const statusRef = useRef(status);
+    const devicesRef = useRef(devices);
 
     // Keep refs up to date to avoid stale closures
     useEffect(() => {
@@ -33,6 +34,10 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
     useEffect(() => {
         statusRef.current = status;
     }, [status]);
+
+    useEffect(() => {
+        devicesRef.current = devices;
+    }, [devices]);
 
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -101,55 +106,143 @@ const VoiceAssistant = ({ onCommand, sensors, status }) => {
             lowerText.includes("ánh sáng") || lowerText.includes("thông số") ||
             lowerText.includes("nóng") || lowerText.includes("mưa") || lowerText.includes("thời tiết") ||
             lowerText.includes("còi") || lowerText.includes("rèm") || lowerText.includes("điều hòa") ||
-            lowerText.includes("tivi") || lowerText.includes("chuyển động") || lowerText.includes("mở") || lowerText.includes("đóng") || lowerText.includes("dừng");
+            lowerText.includes("tivi") || lowerText.includes("chuyển động") || lowerText.includes("mở") ||
+            lowerText.includes("đóng") || lowerText.includes("dừng") || lowerText.includes("yếu") ||
+            lowerText.includes("vừa") || lowerText.includes("max") || lowerText.includes("hé") ||
+            lowerText.includes("toang") || lowerText.includes("nửa") || lowerText.includes("mức") ||
+            lowerText.includes("sáng") || lowerText.includes("độ c") ||
+            lowerText.includes("tăng") || lowerText.includes("giảm");
 
         if (currentStatus !== 'online' && isRecognized) {
             speak("Rất tiếc, hệ thống đang ngoại tuyến, không thể lấy dữ liệu hoặc thực hiện lệnh lúc này.");
             return;
         }
 
-        if (lowerText.includes("bật đèn") || lowerText.includes("mở đèn")) {
-            onCommandRef.current({ device: 'led', action: 'ON', type: 'voice' });
-            responseText = "Đã bật đèn cho bạn.";
+        // === LED: 4 levels (0=off, 1=dim, 2=medium, 3=max) ===
+        if (lowerText.includes("đèn sáng yếu") || lowerText.includes("đèn mức 1") || lowerText.includes("đèn yếu")) {
+            onCommandRef.current({ device: 'led', action: 1, type: 'voice' });
+            responseText = "Đã chỉnh đèn sáng yếu.";
+        } else if (lowerText.includes("đèn sáng vừa") || lowerText.includes("đèn mức 2") || lowerText.includes("đèn vừa")) {
+            onCommandRef.current({ device: 'led', action: 2, type: 'voice' });
+            responseText = "Đã chỉnh đèn sáng vừa.";
+        } else if (lowerText.includes("đèn sáng max") || lowerText.includes("đèn mức 3") || lowerText.includes("đèn tối đa") || lowerText.includes("đèn hết cỡ")) {
+            onCommandRef.current({ device: 'led', action: 3, type: 'voice' });
+            responseText = "Đã chỉnh đèn sáng tối đa.";
+        } else if (lowerText.includes("bật đèn") || lowerText.includes("mở đèn")) {
+            onCommandRef.current({ device: 'led', action: 3, type: 'voice' });
+            responseText = "Đã bật đèn sáng tối đa.";
         } else if (lowerText.includes("tắt đèn") || lowerText.includes("đóng đèn")) {
-            onCommandRef.current({ device: 'led', action: 'OFF', type: 'voice' });
+            onCommandRef.current({ device: 'led', action: 0, type: 'voice' });
             responseText = "Đã tắt đèn.";
+        } else if (lowerText.includes("tăng đèn") || lowerText.includes("đèn sáng hơn") || lowerText.includes("tăng sáng") || lowerText.includes("sáng hơn") || lowerText.includes("tăng độ sáng")) {
+            const currentLed = devicesRef.current.led || 0;
+            if (currentLed >= 3) {
+                responseText = "Đèn đã ở mức sáng tối đa rồi.";
+            } else {
+                const newLevel = currentLed + 1;
+                const labels = ['tắt', 'yếu', 'vừa', 'tối đa'];
+                onCommandRef.current({ device: 'led', action: newLevel, type: 'voice' });
+                responseText = `Đã tăng đèn lên mức ${labels[newLevel]}.`;
+            }
+        } else if (lowerText.includes("giảm đèn") || lowerText.includes("đèn tối hơn") || lowerText.includes("giảm sáng") || lowerText.includes("tối hơn") || lowerText.includes("giảm độ sáng")) {
+            const currentLed = devicesRef.current.led || 0;
+            if (currentLed <= 0) {
+                responseText = "Đèn đã tắt rồi.";
+            } else {
+                const newLevel = currentLed - 1;
+                const labels = ['tắt', 'yếu', 'vừa', 'tối đa'];
+                onCommandRef.current({ device: 'led', action: newLevel, type: 'voice' });
+                responseText = newLevel === 0 ? "Đã tắt đèn." : `Đã giảm đèn xuống mức ${labels[newLevel]}.`;
+            }
+
+        // === FAN ===
         } else if (lowerText.includes("bật quạt") || lowerText.includes("mở quạt")) {
             onCommandRef.current({ device: 'fan', action: 'ON', type: 'voice' });
             responseText = "Đã bật quạt.";
         } else if (lowerText.includes("tắt quạt") || lowerText.includes("dừng quạt")) {
             onCommandRef.current({ device: 'fan', action: 'OFF', type: 'voice' });
             responseText = "Đã tắt quạt.";
+
+        // === BUZZER ===
         } else if (lowerText.includes("bật còi") || lowerText.includes("báo động")) {
             onCommandRef.current({ device: 'buzzer', action: 'ON', type: 'voice' });
             responseText = "Đã bật còi báo động.";
         } else if (lowerText.includes("tắt còi") || lowerText.includes("dừng báo động")) {
             onCommandRef.current({ device: 'buzzer', action: 'OFF', type: 'voice' });
             responseText = "Đã tắt còi.";
-        } else if (lowerText.includes("mở rèm") || lowerText.includes("bật rèm")) {
+
+        // === CURTAIN: 3 levels (0=closed, 50=half, 100=open) ===
+        } else if (lowerText.includes("mở rèm vừa") || lowerText.includes("rèm hé") || lowerText.includes("rèm nửa") || lowerText.includes("mở hé rèm")) {
+            onCommandRef.current({ device: 'curtain', action: 50, type: 'voice' });
+            responseText = "Đã mở rèm vừa phải.";
+        } else if (lowerText.includes("mở rèm") || lowerText.includes("bật rèm") || lowerText.includes("mở toang rèm") || lowerText.includes("rèm hết")) {
             onCommandRef.current({ device: 'curtain', action: 100, type: 'voice' });
-            responseText = "Đã mở rèm cửa.";
+            responseText = "Đã mở toang rèm cửa.";
         } else if (lowerText.includes("đóng rèm") || lowerText.includes("tắt rèm")) {
             onCommandRef.current({ device: 'curtain', action: 0, type: 'voice' });
             responseText = "Đã đóng rèm.";
-        } else if (lowerText.includes("bật điều hòa") || lowerText.includes("mở điều hòa")) {
-            onCommandRef.current({ device: 'ac', action: 100, type: 'voice' });
-            responseText = "Đã bật điều hòa.";
+
+        // === AC: temperature 20-29°C or off ===
         } else if (lowerText.includes("tắt điều hòa") || lowerText.includes("dừng điều hòa")) {
             onCommandRef.current({ device: 'ac', action: 0, type: 'voice' });
             responseText = "Đã tắt điều hòa.";
+        } else if (lowerText.includes("tăng điều hòa") || lowerText.includes("tăng nhiệt độ điều hòa") || lowerText.includes("điều hòa tăng") || lowerText.includes("ấm hơn")) {
+            const currentAc = devicesRef.current.ac || 0;
+            if (currentAc >= 29) {
+                responseText = "Điều hòa đã ở mức tối đa 29 độ C rồi.";
+            } else if (currentAc < 20) {
+                onCommandRef.current({ device: 'ac', action: 20, type: 'voice' });
+                responseText = "Đã bật điều hòa ở 20 độ C.";
+            } else {
+                const newTemp = currentAc + 1;
+                onCommandRef.current({ device: 'ac', action: newTemp, type: 'voice' });
+                responseText = `Đã tăng điều hòa lên ${newTemp} độ C.`;
+            }
+        } else if (lowerText.includes("giảm điều hòa") || lowerText.includes("giảm nhiệt độ điều hòa") || lowerText.includes("điều hòa giảm") || lowerText.includes("mát hơn") || lowerText.includes("lạnh hơn")) {
+            const currentAc = devicesRef.current.ac || 0;
+            if (currentAc <= 20 && currentAc >= 1) {
+                onCommandRef.current({ device: 'ac', action: 0, type: 'voice' });
+                responseText = "Đã tắt điều hòa.";
+            } else if (currentAc < 20) {
+                responseText = "Điều hòa đang tắt. Hãy nói bật điều hòa trước.";
+            } else {
+                const newTemp = currentAc - 1;
+                onCommandRef.current({ device: 'ac', action: newTemp, type: 'voice' });
+                responseText = `Đã giảm điều hòa xuống ${newTemp} độ C.`;
+            }
+        } else if (lowerText.includes("điều hòa")) {
+            // Try to extract temperature: "điều hòa 24 độ" or "bật điều hòa 25"
+            const tempMatch = lowerText.match(/(\d+)\s*(độ|°)/);
+            if (tempMatch) {
+                let temp = parseInt(tempMatch[1]);
+                if (temp >= 20 && temp <= 29) {
+                    onCommandRef.current({ device: 'ac', action: temp, type: 'voice' });
+                    responseText = `Đã chỉnh điều hòa ${temp} độ C.`;
+                } else {
+                    responseText = `Nhiệt độ ${temp} độ nằm ngoài phạm vi. Vui lòng chọn từ 20 đến 29 độ C.`;
+                }
+            } else if (lowerText.includes("bật") || lowerText.includes("mở")) {
+                onCommandRef.current({ device: 'ac', action: 25, type: 'voice' });
+                responseText = "Đã bật điều hòa ở 25 độ C.";
+            }
+
+        // === TV ===
         } else if (lowerText.includes("bật tivi") || lowerText.includes("bật tv") || lowerText.includes("mở tivi")) {
             onCommandRef.current({ device: 'tv', action: 'ON', type: 'voice' });
             responseText = "Đã bật tivi.";
         } else if (lowerText.includes("tắt tivi") || lowerText.includes("tắt tv") || lowerText.includes("dừng tivi")) {
             onCommandRef.current({ device: 'tv', action: 'OFF', type: 'voice' });
             responseText = "Đã tắt tivi.";
+
+        // === MODE ===
         } else if (lowerText.includes("chế độ tự động") || lowerText.includes("bật tự động") || lowerText.includes("chuyển sang tự động") || lowerText.includes("auto")) {
             onCommandRef.current({ device: 'mode', action: 'auto', type: 'voice' });
             responseText = "Đã chuyển sang chế độ tự động.";
         } else if (lowerText.includes("chế độ thủ công") || lowerText.includes("tắt tự động") || lowerText.includes("chuyển sang thủ công") || lowerText.includes("manual")) {
             onCommandRef.current({ device: 'mode', action: 'manual', type: 'voice' });
             responseText = "Đã chuyển sang chế độ thủ công.";
+
+        // === SENSOR QUERIES ===
         } else if (lowerText.includes("nhiệt độ") || lowerText.includes("nóng không")) {
             responseText = `Nhiệt độ hiện tại là ${currentSensors.temperature} độ C.`;
         } else if (lowerText.includes("độ ẩm") || lowerText.includes("mưa không")) {
