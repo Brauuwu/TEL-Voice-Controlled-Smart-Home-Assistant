@@ -21,7 +21,7 @@ struct PayloadNode2 {
   float hum;
   float light;
   bool motion;
-  bool ledState;
+  uint8_t ledLevel;  // 0=off, 1=dim, 2=medium, 3=max
 };
 
 void setup() {
@@ -88,8 +88,14 @@ void loop() {
     lastReceived = millis();
     gatewayConnected = true;
     
-    Serial.print("Received Data - LED: "); Serial.println(data.ledState);
-    digitalWrite(LED_PIN, data.ledState ? HIGH : LOW);
+    Serial.print("Received Data - LED Level: "); Serial.println(data.ledLevel);
+    // PWM output: ESP8266 analogWrite range is 0-1023
+    const int pwmValues[] = {0, 341, 682, 1023};
+    uint8_t level = data.ledLevel > 3 ? 3 : data.ledLevel;
+    analogWrite(LED_PIN, pwmValues[level]);
+    
+    // LED level labels
+    const char* ledLabels[] = {"OFF", "LOW", "MED", "MAX"};
     
     display.clearDisplay();
     display.setCursor(0,0);
@@ -97,7 +103,7 @@ void loop() {
     display.println("--- STATUS ---");
     display.println("");
     
-    display.print("LED: "); display.println(data.ledState ? "ON" : "OFF");
+    display.print("LED: "); display.println(ledLabels[level]);
     display.print("Light: "); display.print(data.light); display.println(" Lux");
     display.print("Motion: "); display.println(data.motion ? "DETECTED" : "CLEAR");
     

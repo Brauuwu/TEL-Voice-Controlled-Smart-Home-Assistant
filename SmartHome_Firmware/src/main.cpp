@@ -14,7 +14,7 @@
 PayloadNode1 n1 = {0.0, 0.0, false};
 ControlMode sysMode = MODE_AUTO;
 bool fanStatus = false;
-bool ledStatus = false;
+uint8_t ledLevel = 0;   // 0=off, 1=dim, 2=medium, 3=max
 bool heaterStatus = false;
 bool pumpStatus = false;
 bool mistStatus = false;
@@ -38,15 +38,23 @@ void onCommand(String topic, String message) {
     fanStatus = (action == "ON");
     digitalWrite(RELAY_PIN, fanStatus);
   } else if (device == "led") {
-    ledStatus = (action == "ON");
+    // LED: 4 levels (0=off, 1=dim, 2=medium, 3=max)
+    ledLevel = doc["action"].is<int>() ? doc["action"].as<int>() : (action == "ON" ? 3 : 0);
+    if (ledLevel > 3) ledLevel = 3;
   } else if (device == "buzzer") {
     buzzerSetManual(action == "ON");
   } else if (device == "curtain") {
+    // Curtain: 3 levels (0=closed, 50=half, 100=open)
     int val = doc["action"].is<int>() ? doc["action"].as<int>() : (action == "ON" ? 100 : 0);
     analogWrite(RGB_R, map(val, 0, 100, 0, 255));
   } else if (device == "ac") {
-    int val = doc["action"].is<int>() ? doc["action"].as<int>() : (action == "ON" ? 100 : 0);
-    analogWrite(RGB_G, map(val, 0, 100, 0, 255));
+    // AC: 10 levels (20-29°C) or 0=off
+    int val = doc["action"].is<int>() ? doc["action"].as<int>() : (action == "ON" ? 25 : 0);
+    if (val >= 20 && val <= 29) {
+      analogWrite(RGB_G, map(val, 20, 29, 28, 255));
+    } else {
+      analogWrite(RGB_G, 0);
+    }
   } else if (device == "tv") {
     int val = doc["action"].is<int>() ? doc["action"].as<int>() : (action == "ON" ? 100 : 0);
     analogWrite(RGB_B, map(val, 0, 100, 0, 255));
@@ -130,14 +138,14 @@ void loop() {
     n2.hum = n1.hum;
     n2.light = ldr;
     n2.motion = n1.motion;
-    n2.ledState = ledStatus;
+    n2.ledLevel = ledLevel;
     actuatorNodeConnected = nrfWriteNode2(n2);
   }
 
   if (millis() - lastScreenUpdate > 1000) {
     lastScreenUpdate = millis();
-    mqttPublishTelemetry(n1, ldr, sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected, actuatorNodeConnected);
-    drawDashboard(n1, ldr, isWifiConnected(), getWifiRSSI(), isMqttConnected(), sysMode, fanStatus, ledStatus, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected);
+    mqttPublishTelemetry(n1, ldr, sysMode, fanStatus, ledLevel, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected, actuatorNodeConnected);
+    drawDashboard(n1, ldr, isWifiConnected(), getWifiRSSI(), isMqttConnected(), sysMode, fanStatus, ledLevel > 0, heaterStatus, pumpStatus, mistStatus, sensorNodeConnected);
     buzzerAlert(n1.temp, n1.motion);
   }
 }

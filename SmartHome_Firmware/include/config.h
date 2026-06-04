@@ -55,7 +55,7 @@ struct PayloadNode2 {
   float hum;
   float light;
   bool motion;
-  bool ledState;
+  uint8_t ledLevel;  // 0=off, 1=dim, 2=medium, 3=max
 };
 
 enum ControlMode {

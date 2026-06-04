@@ -12,7 +12,7 @@ const Dashboard = ({ user, onLogout }) => {
     const navigate = useNavigate();
     const [sensors, setSensors] = useState({ temperature: 0, humidity: 0, motion: false, ldr: 0 });
     const [history, setHistory] = useState([]);
-    const [devices, setDevices] = useState({ led: false, fan: false, buzzer: false, curtain: 0, ac: 0, tv: false });
+    const [devices, setDevices] = useState({ led: 0, fan: false, buzzer: false, curtain: 0, ac: 0, tv: false });
     const [logs, setLogs] = useState([]);
     const [status, setStatus] = useState('offline');
     const [nodeStatus, setNodeStatus] = useState({ sensorNode: false, actuatorNode: false });
@@ -66,15 +66,22 @@ const Dashboard = ({ user, onLogout }) => {
             } else if (data.device === 'mode') {
                 setMode(data.status);
             } else if (devices.hasOwnProperty(data.device)) {
-                setDevices(prev => ({ ...prev, [data.device]: data.status === 'ON' || data.status === true || data.status === 1 }));
+                // Preserve numeric values for level-based devices
+                const numericDevices = ['led', 'curtain', 'ac'];
+                if (numericDevices.includes(data.device)) {
+                    const val = typeof data.status === 'number' ? data.status : parseInt(data.status);
+                    setDevices(prev => ({ ...prev, [data.device]: isNaN(val) ? (data.status === 'ON' ? 1 : 0) : val }));
+                } else {
+                    setDevices(prev => ({ ...prev, [data.device]: data.status === 'ON' || data.status === true || data.status === 1 }));
+                }
             }
         });
 
         socket.on('new_activity', (data) => {
             setLogs(prev => [data, ...prev].slice(0, 50));
             setLatestActivity(data);
-            // Auto-hide toast after 4 seconds
-            setTimeout(() => setLatestActivity(null), 4000);
+            // Auto-hide toast after 8 seconds
+            setTimeout(() => setLatestActivity(null), 8000);
         });
 
         return () => {
@@ -89,9 +96,38 @@ const Dashboard = ({ user, onLogout }) => {
             case 'led': return <Lightbulb className="w-4 h-4" />;
             case 'fan': return <Wind className="w-4 h-4" />;
             case 'curtain': return <Maximize2 className="w-4 h-4" />;
+            case 'ac': return <AirVent className="w-4 h-4" />;
+            case 'tv': return <Tv className="w-4 h-4" />;
             case 'gateway': return <Cpu className="w-4 h-4" />;
             default: return <Activity className="w-4 h-4" />;
         }
+    };
+
+    const formatAction = (device, action) => {
+        const val = typeof action === 'string' ? parseInt(action) : action;
+        const dev = device?.toLowerCase();
+        if (dev === 'led') {
+            const labels = { 0: 'Tắt', 1: 'Sáng yếu', 2: 'Sáng vừa', 3: 'Sáng max' };
+            if (!isNaN(val) && labels[val] !== undefined) return labels[val];
+        }
+        if (dev === 'curtain') {
+            if (val === 0) return 'Đóng';
+            if (val === 50) return 'Mở vừa';
+            if (val === 100) return 'Mở toang';
+        }
+        if (dev === 'ac') {
+            if (!isNaN(val) && val >= 20 && val <= 29) return `${val}°C`;
+            if (val === 0 || action === 'OFF') return 'Tắt';
+        }
+        if (action === 'ON' || action === 'true' || action === true || action === 'ONLINE') return 'Bật';
+        if (action === 'OFF' || action === 'false' || action === false || action === 'OFFLINE') return 'Tắt';
+        return String(action);
+    };
+
+    const isActionPositive = (device, action) => {
+        const val = typeof action === 'string' ? parseInt(action) : action;
+        if (typeof val === 'number' && !isNaN(val)) return val > 0;
+        return action === 'ON' || action === 'true' || action === true || action === 'ONLINE';
     };
 
     const controlDevice = (device, action, type = 'manual') => {
@@ -229,7 +265,7 @@ const Dashboard = ({ user, onLogout }) => {
                                             <div key={i} className="group p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent bg-white shadow-sm ring-1 ring-slate-100">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div className="text-xs font-black text-slate-800 flex items-center gap-2">
-                                                        <div className={`p-1.5 rounded-lg ${log.action === 'ON' || log.action === 'true' || log.action === 'ONLINE' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
+                                                        <div className={`p-1.5 rounded-lg ${isActionPositive(log.device, log.action) ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}`}>
                                                             {getDeviceIcon(log.device)}
                                                         </div>
                                                         {log.device.toUpperCase()}
@@ -240,9 +276,7 @@ const Dashboard = ({ user, onLogout }) => {
                                                 </div>
                                                 <div className="flex justify-between items-end">
                                                     <p className="text-[10px] text-slate-500 font-medium">
-                                                        {typeof log.action === 'number' || (!isNaN(log.action) && log.action !== 'ON' && log.action !== 'OFF')
-                                                            ? `Set to ${log.action}%`
-                                                            : (log.action === 'ON' || log.action === 'true' || log.action === 'ONLINE' ? 'Switched ON' : 'Switched OFF')} by <span className="text-slate-800 font-bold">{log.username === 'auto' ? 'AI' : log.username}</span>
+                                                        {formatAction(log.device, log.action)} by <span className="text-slate-800 font-bold">{log.username === 'auto' ? 'AI' : log.username}</span>
                                                     </p>
                                                     <span className={`text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest ${log.event_type === 'manual' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
                                                         {log.event_type}
@@ -338,11 +372,17 @@ const Dashboard = ({ user, onLogout }) => {
                         </div>
 
                         <div className="space-y-4 lg:space-y-6">
-                            <DeviceToggle
+                            <SegmentedControl
                                 icon={<Lightbulb />}
                                 label="Main LED"
-                                active={devices.led}
-                                onClick={() => controlDevice('led', 'TOGGLE')}
+                                value={devices.led}
+                                options={[
+                                    { label: 'Tắt', value: 0 },
+                                    { label: 'Yếu', value: 1 },
+                                    { label: 'Vừa', value: 2 },
+                                    { label: 'Max', value: 3 }
+                                ]}
+                                onChange={(val) => controlDevice('led', val)}
                                 color="yellow"
                             />
                             <DeviceToggle
@@ -362,21 +402,29 @@ const Dashboard = ({ user, onLogout }) => {
                                 bounce={devices.buzzer}
                             />
 
-                            {/* RGB Sliders */}
+                            {/* Adjustable Devices */}
                             <div className="space-y-6 p-6 rounded-2xl bg-slate-50/50 border border-slate-100">
                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Adjustable Nodes</h3>
 
-                                <SliderControl
-                                    icon={<Maximize2 className="text-rose-500" />}
+                                <SegmentedControl
+                                    icon={<Maximize2 />}
                                     label="Curtain"
                                     value={devices.curtain}
+                                    options={[
+                                        { label: 'Đóng', value: 0 },
+                                        { label: 'Vừa', value: 50 },
+                                        { label: 'Mở', value: 100 }
+                                    ]}
                                     onChange={(val) => controlDevice('curtain', val)}
                                     color="rose"
                                 />
-                                <SliderControl
-                                    icon={<AirVent className="text-emerald-500" />}
+                                <StepperControl
+                                    icon={<AirVent />}
                                     label="AC Unit"
                                     value={devices.ac}
+                                    min={20}
+                                    max={29}
+                                    unit="°C"
                                     onChange={(val) => controlDevice('ac', val)}
                                     color="emerald"
                                 />
@@ -410,15 +458,13 @@ const Dashboard = ({ user, onLogout }) => {
             {latestActivity && (
                 <div className="fixed top-6 lg:top-24 right-4 lg:right-8 z-[110] animate-slide-in-right">
                     <div className="bg-slate-900/90 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 ring-1 ring-black/5">
-                        <div className={`p-2 rounded-xl ${latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === 'ONLINE' || latestActivity.action === true ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'} shadow-lg`}>
+                        <div className={`p-2 rounded-xl ${isActionPositive(latestActivity.device, latestActivity.action) ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'} shadow-lg`}>
                             {getDeviceIcon(latestActivity.device)}
                         </div>
                         <div className="flex flex-col">
                             <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 leading-none mb-1">{latestActivity.device}</p>
                             <p className="text-xs font-bold leading-none">
-                                {typeof latestActivity.action === 'number' || !isNaN(latestActivity.action) && latestActivity.action !== 'ON' && latestActivity.action !== 'OFF'
-                                    ? `Set to ${latestActivity.action}%`
-                                    : (latestActivity.action === 'ON' || latestActivity.action === 'true' || latestActivity.action === true ? 'ON' : 'OFF')}
+                                {formatAction(latestActivity.device, latestActivity.action)}
                             </p>
                         </div>
                     </div>
@@ -500,28 +546,91 @@ const DeviceToggle = ({ icon, label, active, onClick, color, spin, bounce }) => 
     );
 };
 
-const SliderControl = ({ icon, label, value, onChange, color }) => {
-    const accentColors = {
-        rose: 'accent-rose-500',
-        emerald: 'accent-emerald-500',
-        indigo: 'accent-indigo-500'
+const SegmentedControl = ({ icon, label, value, options, onChange, color }) => {
+    const colorMap = {
+        yellow: { active: 'bg-yellow-500 text-white shadow-yellow-200', icon: 'bg-yellow-100 text-yellow-600 shadow-yellow-100' },
+        rose: { active: 'bg-rose-500 text-white shadow-rose-200', icon: 'bg-rose-100 text-rose-600 shadow-rose-100' },
+        emerald: { active: 'bg-emerald-500 text-white shadow-emerald-200', icon: 'bg-emerald-100 text-emerald-600 shadow-emerald-100' },
     };
+    const colors = colorMap[color] || colorMap.yellow;
+    const isActive = value > 0 || value === true;
 
     return (
-        <div className="space-y-2">
-            <div className="flex justify-between items-center text-[10px] lg:text-xs font-bold text-slate-600">
-                <div className="flex items-center gap-2">
-                    {React.cloneElement(icon, { className: 'w-3.5 h-3.5' })}
-                    <span className="uppercase tracking-tight">{label}</span>
+        <div className="p-4 lg:p-5 rounded-2xl bg-slate-50 border border-slate-100 group hover:shadow-md transition-all">
+            <div className="flex items-center gap-3 mb-4">
+                <div className={`p-2.5 rounded-xl transition-all ${isActive ? colors.icon + ' shadow-lg' : 'bg-slate-200 text-slate-400'}`}>
+                    {React.cloneElement(icon, { className: `w-4 h-4 ${isActive ? 'animate-pulse' : ''}` })}
                 </div>
-                <span className={`font-black ${color === 'rose' ? 'text-rose-600' : 'text-emerald-600'}`}>{value}%</span>
+                <div>
+                    <p className="text-xs font-black text-slate-800 uppercase tracking-tight">{label}</p>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                        {options.find(o => o.value === value)?.label || 'Off'}
+                    </p>
+                </div>
             </div>
-            <input
-                type="range" min="0" max="100"
-                value={value}
-                onChange={(e) => onChange(parseInt(e.target.value))}
-                className={`w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer ${accentColors[color]}`}
-            />
+            <div className="flex gap-1.5 bg-slate-200/60 p-1 rounded-xl">
+                {options.map((opt) => (
+                    <button
+                        key={opt.value}
+                        onClick={() => onChange(opt.value)}
+                        className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                            value === opt.value
+                                ? colors.active + ' shadow-md'
+                                : 'text-slate-500 hover:bg-white hover:shadow-sm'
+                        }`}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+const StepperControl = ({ icon, label, value, min, max, unit, onChange, color }) => {
+    const colorMap = {
+        emerald: { text: 'text-emerald-600', bg: 'bg-emerald-50', icon: 'bg-emerald-100 text-emerald-600 shadow-emerald-100', btn: 'hover:bg-emerald-100 text-emerald-600' },
+        rose: { text: 'text-rose-600', bg: 'bg-rose-50', icon: 'bg-rose-100 text-rose-600 shadow-rose-100', btn: 'hover:bg-rose-100 text-rose-600' },
+    };
+    const colors = colorMap[color] || colorMap.emerald;
+    const isActive = value >= min;
+
+    return (
+        <div className="p-4 lg:p-5 rounded-2xl bg-slate-50 border border-slate-100 group hover:shadow-md transition-all">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-xl transition-all ${isActive ? colors.icon + ' shadow-lg' : 'bg-slate-200 text-slate-400'}`}>
+                        {React.cloneElement(icon, { className: `w-4 h-4 ${isActive ? 'animate-pulse' : ''}` })}
+                    </div>
+                    <div>
+                        <p className="text-xs font-black text-slate-800 uppercase tracking-tight">{label}</p>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                            {isActive ? `${value}${unit}` : 'Off'}
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    {isActive && (
+                        <button
+                            onClick={() => onChange(value <= min ? 0 : value - 1)}
+                            className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg bg-white border border-slate-200 transition-all ${colors.btn} shadow-sm`}
+                        >
+                            −
+                        </button>
+                    )}
+                    <div className={`min-w-[52px] h-8 rounded-lg flex items-center justify-center font-black text-sm ${
+                        isActive ? colors.bg + ' ' + colors.text : 'bg-slate-200 text-slate-400'
+                    }`}>
+                        {isActive ? `${value}${unit}` : 'OFF'}
+                    </div>
+                    <button
+                        onClick={() => onChange(isActive ? Math.min(value + 1, max) : min)}
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg bg-white border border-slate-200 transition-all ${colors.btn} shadow-sm`}
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

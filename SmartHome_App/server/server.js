@@ -22,7 +22,7 @@ app.use(bodyParser.json());
 
 // Global State
 app.locals.currentMode = 'manual';
-app.locals.lastState = { fan: false, led: false, buzzer: false };
+app.locals.lastState = { fan: false, led: 0, buzzer: false };
 app.locals.latestSensors = { temperature: 0, humidity: 0, ldr: 0, motion: false };
 
 // Helper to evaluate auto logic
@@ -31,13 +31,14 @@ const evaluateAutoLogic = async (sensors) => {
     const mode = app.locals.currentMode;
     if (mode !== 'auto') return;
 
-    // Logic 1: LDR or Motion -> LED
+    // Logic 1: LDR or Motion -> LED (level 3=max when ON, 0=off)
     const shouldLedBeOn = (ldr < 100 || motion === true || motion === 1);
-    if (shouldLedBeOn !== app.locals.lastState.led) {
-        const action = shouldLedBeOn ? 'ON' : 'OFF';
+    const targetLedLevel = shouldLedBeOn ? 3 : 0;
+    if (targetLedLevel !== app.locals.lastState.led) {
+        const action = targetLedLevel;
         mqttClient.publish('smarthome/commands/led', JSON.stringify({ device: 'led', action, username: 'auto', type: 'auto' }));
-        db.query('INSERT INTO activity_logs (event_type, device, action, username, details) VALUES (?, ?, ?, ?, ?)', ['auto', 'led', action, 'System', `Auto-trigger (LDR:${ldr}, Motion:${motion})`]);
-        io.emit('new_activity', { event_type: 'auto', device: 'led', action, username: 'System', details: 'Auto-trigger', timestamp: new Date() });
+        db.query('INSERT INTO activity_logs (event_type, device, action, username, details) VALUES (?, ?, ?, ?, ?)', ['auto', 'led', String(action), 'System', `Auto-trigger (LDR:${ldr}, Motion:${motion})`]);
+        io.emit('new_activity', { event_type: 'auto', device: 'led', action: String(action), username: 'System', details: 'Auto-trigger', timestamp: new Date() });
         io.emit('status_update', { device: 'led', status: action });
     }
 
@@ -57,7 +58,7 @@ const evaluateAutoLogic = async (sensors) => {
         io.emit('status_update', { device: 'buzzer', status: action });
     }
 
-    app.locals.lastState = { fan: shouldCoolingBeOn, led: shouldLedBeOn, buzzer: shouldCoolingBeOn };
+    app.locals.lastState = { fan: shouldCoolingBeOn, led: targetLedLevel, buzzer: shouldCoolingBeOn };
 };
 
 // Database Connection
