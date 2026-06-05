@@ -369,10 +369,10 @@ const Dashboard = ({ user, onLogout }) => {
                         </div>
                     </div>
                     
-                    {/* AI Assistant */}
+                    {/* Voice Assistant */}
                     <div className="order-4 xl:order-none w-full premium-gradient rounded-[2rem] p-6 lg:p-8 text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
                         <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all"></div>
-                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">AI Assistant</h3>
+                        <h3 className="font-bold mb-2 flex items-center gap-2 text-indigo-100 uppercase tracking-widest text-[10px]">Voice Assistant</h3>
                         <p className="text-sm font-medium leading-relaxed opacity-90">Voice commands are active. Try "Bật đèn", "Tăng độ sáng", "Điều hòa 24 độ" or "Hỏi nhiệt độ".</p>
                     </div>
                 </div>
